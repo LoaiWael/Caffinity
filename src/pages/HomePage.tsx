@@ -72,7 +72,7 @@ const HomePage = () => {
                     <div className="bg-brand-gray-light aspect-square overflow-hidden rounded-2xl">
                         <img src={categoryImages[cat.name] || 'https://img-wrapper.vercel.app/image?url=https://placehold.co/400x400.png'} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
                     </div>
-                    <h3 className="mt-4 font-semibold uppercase tracking-wider capitalize">{cat.name}</h3>
+                    <h3 className="mt-4 font-semibold tracking-wider capitalize">{cat.name}</h3>
                 </Link>
             ))}
           </div>
