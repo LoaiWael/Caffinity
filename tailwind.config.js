@@ -14,6 +14,7 @@ export default {
         'brand-black': '#282828',
         'brand-yellow': '#C3B212',
         'brand-red': '#BC575F',
+        'brand-green': '#1FEA59'
       },
       fontFamily: {
         'heading': ['"Prosto One"', 'sans-serif'],
