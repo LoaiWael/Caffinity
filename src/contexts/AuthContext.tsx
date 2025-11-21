@@ -1,105 +1,135 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { AuthError, Session, User as SupabaseUser } from '@supabase/supabase-js';
-import { Profile } from '../types';
-import toast from 'react-hot-toast';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
+import toast from "react-hot-toast";
+
+interface User {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: SupabaseUser | null;
-  profile: Profile | null;
-  login: (credentials: { email: string, password: string }) => Promise<{ error: AuthError | null }>;
-  signUp: (credentials: { email: string, password: string, firstName: string, lastName: string }) => Promise<{ error: AuthError | null }>;
-  logout: () => Promise<void>;
+  user: User | null;
+  profile: User | null;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
+  signUp: (credentials: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) => Promise<void>;
+  logout: () => void;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Load session from localStorage
   useEffect(() => {
-    const getInitialSession = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-            setProfile(profileData);
-        }
-        setLoading(false);
-    };
-
-    getInitialSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-            if (_event === 'SIGNED_IN') {
-                toast.success('Logged in successfully!');
-            }
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-            setProfile(profileData);
-        } else {
-            setProfile(null);
-        }
-        setLoading(false);
-    });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
+    const savedUser = localStorage.getItem("auth_user");
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      setProfile(parsedUser);
+    }
+    setLoading(false);
   }, []);
 
-  const login = async (credentials: { email: string, password: string }) => {
+  // ---------------------------------------------
+  // LOGIN
+  // ---------------------------------------------
+  const login = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword(credentials);
-    if (error) {
-        toast.error(error.message);
+
+    const savedUsers = JSON.parse(localStorage.getItem("all_users") || "[]");
+
+    const found = savedUsers.find(
+      (u: any) => u.email === email && u.password === password
+    );
+
+    if (!found) {
+      toast.error("Invalid email or password");
+      setLoading(false);
+      return;
     }
+
+    localStorage.setItem("auth_user", JSON.stringify(found));
+    setUser(found);
+    setProfile(found);
+
+    toast.success("Logged in successfully!");
     setLoading(false);
-    return { error };
   };
 
-  const signUp = async (credentials: { email: string, password: string, firstName: string, lastName: string }) => {
+  // ---------------------------------------------
+  // SIGN UP
+  // ---------------------------------------------
+  const signUp = async ({ email, password, firstName, lastName }: any) => {
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: credentials.email,
-      password: credentials.password,
-      options: {
-        data: {
-          first_name: credentials.firstName,
-          last_name: credentials.lastName,
-        }
-      }
-    });
-     if (error) {
-        toast.error(error.message);
-    } else {
-        toast.success('Success! Please check your email to confirm your account.');
+
+    const users = JSON.parse(localStorage.getItem("all_users") || "[]");
+
+    // prevent duplicate accounts
+    if (users.find((u: any) => u.email === email)) {
+      toast.error("Email already exists");
+      setLoading(false);
+      return false;
     }
+
+    const newUser = { email, password, firstName, lastName };
+
+    users.push(newUser);
+    localStorage.setItem("all_users", JSON.stringify(users));
+
+    // auto-login after signup
+    localStorage.setItem("auth_user", JSON.stringify(newUser));
+    setUser(newUser);
+    setProfile(newUser);
+
+    toast.success("Account created successfully!");
     setLoading(false);
-    return { error };
+    return true;
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    toast.success('Logged out successfully.');
+  // ---------------------------------------------
+  // LOGOUT
+  // ---------------------------------------------
+  const logout = () => {
+    localStorage.removeItem("auth_user");
+    setUser(null);
+    setProfile(null);
+    toast.success("Logged out successfully.");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, user, profile, login, signUp, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated: !!user,
+        user,
+        profile,
+        login,
+        signUp,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -107,8 +137,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
