@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useProductsContext } from '../contexts/ProductContext';
 import ProductCard from '../components/ProductCard';
 import { ChevronDown, Plus, Minus } from 'lucide-react';
+import collectionBackground from '../assets/img/collection-background.webp';
 
 const FilterSection = ({ title, children, defaultOpen = false }: { title: string, children: React.ReactNode, defaultOpen?: boolean }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -88,14 +89,14 @@ const CollectionsPage = () => {
   }, [products, selectedCategories, sortOption]);
 
   return (
-    <div>
-      <section className="relative h-80 bg-brand-gray-light">
+    <div className='mt-[-7rem]'>
+      <section className="relative h-96 bg-brand-gray-light">
         <img 
-          src="https://images.unsplash.com/photo-1559563458-52799d3501ee?q=80&w=2070&auto=format&fit=crop" 
+          src={collectionBackground} 
           alt="Collections"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center pt-24">
             <h1 className="font-heading text-5xl text-white">Our Collections</h1>
         </div>
       </section>
