@@ -1,11 +1,16 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useProductsContext } from '../contexts/ProductContext';
 import ProductCard from '../components/ProductCard';
 
-const AccessoriesPage = () => {
+const CoffeePage = () => {
   const { products, loading } = useProductsContext();
 
-  const accessoryProducts = products.filter(
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const coffeeProducts = products.filter(
+    // Edit Filters after products are ready (انا الي كاتب الكومنت دة)
     p => p.category.name === 'jewelery' || p.category.name === 'electronics'
   );
 
@@ -13,26 +18,26 @@ const AccessoriesPage = () => {
     <div className="bg-brand-white">
       <section className="bg-brand-gray-light text-center py-20">
         <div className="container mx-auto px-6">
-          <h1 className="font-heading text-5xl mb-4">Accessories</h1>
+          <h1 className="font-heading text-5xl mb-4">Coffee</h1>
           <p className="text-lg text-brand-black/70 max-w-2xl mx-auto">
-            Elevate your lifestyle with our curated collection of high-quality accessories.
+            Your destination for exceptional coffee beans, grounds, and brewing equipment. Taste the difference quality makes.
           </p>
         </div>
       </section>
 
       <main className="container mx-auto px-6 py-16">
         {loading ? (
-          <div className="text-center">Loading accessories...</div>
+          <div className="text-center">Loading Coffees...</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
-            {accessoryProducts.map(product => (
+            {coffeeProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
-        {!loading && accessoryProducts.length === 0 && (
+        {!loading && coffeeProducts.length === 0 && (
             <div className="text-center py-20">
-                <p className="text-lg text-brand-black/70">No accessories found.</p>
+                <p className="text-lg text-brand-black/70">No Coffees found.</p>
             </div>
         )}
       </main>
@@ -40,4 +45,4 @@ const AccessoriesPage = () => {
   );
 };
 
-export default AccessoriesPage;
+export default CoffeePage;

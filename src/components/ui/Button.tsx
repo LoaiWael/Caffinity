@@ -37,7 +37,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, to, ...props }, ref) => {
     if (asChild && to) {
       return (
-        <Link to={to} className={cn(buttonVariants({ variant, size }), className)} {...props} />
+        <Link to={to} className={`${cn(buttonVariants({ variant, size }), className)} shadow-brand-black/20 shadow-lg rounded-xl`} {...props} />
       );
     }
     

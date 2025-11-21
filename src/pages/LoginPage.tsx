@@ -10,6 +10,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);

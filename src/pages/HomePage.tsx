@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Coffee, Award, Truck, Tag } from 'lucide-react';
@@ -30,17 +30,21 @@ const blogPosts: Omit<BlogPost, 'id' | 'author' | 'date'>[] = [
 
 const HomePage = () => {
     const { categories } = useProductsContext();
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
+
   return (
     <div className="bg-brand-white">
       {/* Hero Section */}
-      <section className="relative container mx-auto flex flex-col lg:flex-row items-center justify-center lg:justify-start py-20 lg:py-0 lg:h-[calc(100vh-6rem)]">
+      <section className="relative container mx-auto mt-3 flex flex-col lg:flex-row items-center justify-center lg:justify-start py-20 lg:py-0 lg:h-[calc(100vh-6rem)]">
         <div className="lg:w-1/2 text-center lg:text-left z-10 p-8">
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-brand-black mb-6">Quality Products, Unbeatable Prices</h1>
-          <p className="text-brand-black/80 mb-8 max-w-md mx-auto lg:mx-0">Lorem ipsum dolor sit amet consectetur. Orci nibh nullam risus adipiscing odio. Neque lacus nibh eros in.</p>
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-brand-black mb-6">Taste the perfect moment.</h1>
+          <p className="text-brand-black/80 mb-8 max-w-md mx-auto lg:mx-0">Your daily dose of delicious. Shop the finest coffees and teas, delivered right to your door.</p>
           <Button asChild to="/collections">Browse Collections</Button>
         </div>
-        <div className="lg:absolute lg:right-0 lg:top-0 lg:w-1/2 h-64 lg:h-full w-full mt-8 lg:mt-0">
-          <img src="https://images.unsplash.com/photo-1526178613552-2b45c6c302f0?q=80&w=2070&auto=format&fit=crop" alt="Featured products" className="w-full h-full object-cover"/>
+        <div className="lg:absolute lg:right-0 lg:top-0 lg:w-1/2 lg:h-full w-full mt-8 lg:mt-0 px-4 h-auto">
+          <img src="src/assets/img/drinks-photo.webp" alt="Featured products" className="w-full lg:h-[80vh] object-cover rounded-3xl"/>
         </div>
       </section>
 
@@ -65,7 +69,7 @@ const HomePage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
             {categories.slice(0, 8).map(cat => (
                 <Link to={`/collections?category=${cat.name}`} key={cat.id} className="group">
-                    <div className="bg-brand-gray-light aspect-square overflow-hidden">
+                    <div className="bg-brand-gray-light aspect-square overflow-hidden rounded-2xl">
                         <img src={categoryImages[cat.name] || 'https://img-wrapper.vercel.app/image?url=https://placehold.co/400x400.png'} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
                     </div>
                     <h3 className="mt-4 font-semibold uppercase tracking-wider capitalize">{cat.name}</h3>

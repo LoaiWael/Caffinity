@@ -33,6 +33,10 @@ const CollectionsPage = () => {
   const { products, categories, loading, error } = useProductsContext();
   const location = useLocation();
   
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+  
   const getInitialCategory = () => {
     const params = new URLSearchParams(location.search);
     const category = params.get('category');

@@ -13,6 +13,10 @@ const SignUpPage = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSuccess(false);
