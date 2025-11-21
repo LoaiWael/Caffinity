@@ -26,6 +26,10 @@ const AccountPage = () => {
   const { profile, logout, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   if (authLoading)
     return <div className="text-center py-20">Loading account...</div>;
   if (!profile) {

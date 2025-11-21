@@ -7,7 +7,6 @@ import CartPage from '../pages/CartPage';
 import CheckoutDeliveryPage from '../pages/CheckoutDeliveryPage';
 import CoffeePage from '../pages/CoffeePage';
 import TeaPage from '../pages/TeaPage';
-import BlogPage from '../pages/BlogPage';
 import ContactPage from '../pages/ContactPage';
 import AccountPage from '../pages/AccountPage';
 import CheckoutPaymentPage from '../pages/CheckoutPaymentPage';
@@ -27,7 +26,6 @@ export const router = createBrowserRouter([
       { path: 'cart', element: <CartPage /> },
       { path: 'coffee', element: <CoffeePage /> },
       { path: 'tea', element: <TeaPage /> },
-      { path: 'blog', element: <BlogPage /> },
       { path: 'contact', element: <ContactPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignUpPage /> },
