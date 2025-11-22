@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useProductsContext } from "../contexts/ProductContext";
 import ProductCard from "../components/ProductCard";
-import teaBackground from "../assets/img/tea-background.webp";
 
 const TeaPage = () => {
   const { products, loading } = useProductsContext();
@@ -17,16 +16,11 @@ const TeaPage = () => {
 
   return (
     <div className="bg-brand-white mt-[-7rem]">
-      <section className="relative h-96 bg-brand-gray-light">
-        <img
-          src={teaBackground}
-          alt="Coffee"
-          className="w-full h-full object-cover object-top"
-        />
-        <div className="absolute text-brand-black inset-0 bg-black/30 text-center flex-col flex items-center justify-center pt-24">
-          <h1 className="font-heading text-5xl mb-4">Tea</h1>
-          <p className="text-lg max-w-2xl mx-auto">
-            Elevate your daily ritual. Shop our finest teas and infusions,
+      <section className="relative h-96 bg-brand-gray-light bg-[url(src/assets/img/tea-background.webp)] bg-repeat bg-contain bg-top bg-blend-darken">
+        <div className="absolute inset-0 text-brand-black bg-brand-gray/30 text-center flex-col flex items-center justify-center pt-24">
+          <h1 className="font-heading text-5xl mb-1">Tea</h1>
+          <p className="mx-3 max-w-2xl lg:mx-auto shadow-brand-gray-dark/70 shadow-md bg-brand-white/80 backdrop-blur-md py-1 px-2 rounded-xl text-sm">
+            Shop our finest teas and infusions,
             meticulously chosen for exceptional aroma and taste.
           </p>
         </div>
