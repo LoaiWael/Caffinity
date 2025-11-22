@@ -124,7 +124,7 @@ const HomePage = () => {
                       alt={product.title}
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-2 left-2 bg-red-600 text-brand-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+                    <div className="absolute top-2 left-2 bg-brand-red text-brand-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
                       <Percent className="h-4 w-4" />
                       20% OFF
                     </div>
