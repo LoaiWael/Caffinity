@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { CartItem, Product } from '../types';
 import toast from 'react-hot-toast';
 
@@ -17,8 +17,16 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(JSON.parse(localStorage.getItem('cart')!) ?? []);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    updateLocalStorage();
+  }, [cartItems])
+
+  const updateLocalStorage = () => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }
 
   const addToCart = (product: Product, quantityToAdd: number = 1) => {
     setCartItems(prevItems => {
@@ -36,23 +44,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const removeFromCart = (productId: number) => {
     setCartItems(prevItems => {
-        const itemToRemove = prevItems.find(item => item.id === productId);
-        if(itemToRemove) {
-            toast.error(`${itemToRemove.title} removed from cart.`);
-        }
-        return prevItems.filter(item => item.id !== productId)
+      const itemToRemove = prevItems.find(item => item.id === productId);
+      if (itemToRemove) {
+        toast.error(`${itemToRemove.title} removed from cart.`);
+      }
+      return prevItems.filter(item => item.id !== productId)
     });
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
     if (quantity <= 0) {
-        removeFromCart(productId);
+      removeFromCart(productId);
     } else {
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-              item.id === productId ? { ...item, quantity } : item
-            )
-        );
+      setCartItems(prevItems =>
+        prevItems.map(item =>
+          item.id === productId ? { ...item, quantity } : item
+        )
+      );
     }
   };
 
