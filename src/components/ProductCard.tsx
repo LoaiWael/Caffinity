@@ -26,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   }
 
   return (
-    <div className="group border-2 border-brand-gray/60 rounded-2xl shadow-brand-black/5 shadow-md relative">
+    <div className=" transition-all group border-2 border-brand-gray/60 rounded-2xl shadow-brand-black/5 shadow-md relative lg:hover:scale-[1.0125] lg:hover:shadow-lg">
       <Link to={`/products/${product.id}`} className="flex flex-col items-start p-3">
         <div className="bg-brand-gray-light w-full aspect-square overflow-hidden mb-4 rounded-lg">
           <img
