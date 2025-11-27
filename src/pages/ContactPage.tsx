@@ -52,6 +52,9 @@ const faqItems = [
   ];
 
 const ContactPage = () => {
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

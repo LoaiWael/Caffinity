@@ -1,11 +1,14 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
-import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Plus, Minus } from 'lucide-react';
 
 const CartPage = () => {
     const { cartItems, removeFromCart, updateQuantity, totalPrice } = useCart();
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, []);
 
     return (
         <div className="bg-brand-white min-h-screen">

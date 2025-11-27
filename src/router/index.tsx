@@ -5,8 +5,8 @@ import CollectionsPage from '../pages/CollectionsPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
 import CartPage from '../pages/CartPage';
 import CheckoutDeliveryPage from '../pages/CheckoutDeliveryPage';
-import AccessoriesPage from '../pages/AccessoriesPage';
-import BlogPage from '../pages/BlogPage';
+import CoffeePage from '../pages/CoffeePage';
+import TeaPage from '../pages/TeaPage';
 import ContactPage from '../pages/ContactPage';
 import AccountPage from '../pages/AccountPage';
 import CheckoutPaymentPage from '../pages/CheckoutPaymentPage';
@@ -24,8 +24,8 @@ export const router = createBrowserRouter([
       { path: 'collections', element: <CollectionsPage /> },
       { path: 'products/:id', element: <ProductDetailPage /> },
       { path: 'cart', element: <CartPage /> },
-      { path: 'accessories', element: <AccessoriesPage /> },
-      { path: 'blog', element: <BlogPage /> },
+      { path: 'coffee', element: <CoffeePage /> },
+      { path: 'tea', element: <TeaPage /> },
       { path: 'contact', element: <ContactPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignUpPage /> },

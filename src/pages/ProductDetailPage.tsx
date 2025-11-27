@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useProduct, useProducts } from '../hooks/useProducts';
 import { Button } from '../components/ui/Button';
@@ -12,6 +12,10 @@ const ProductDetailPage = () => {
   const { products: allProducts } = useProducts();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   if (loading) return <div className="container mx-auto text-center py-40">Loading Product...</div>;
   if (error || !product) return <div className="container mx-auto text-center py-40 text-red-500">Product not found.</div>;

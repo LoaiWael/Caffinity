@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { useCart } from '../contexts/CartContext';
@@ -15,6 +15,10 @@ const InputField = ({ label, type = 'text', placeholder }: { label: string, type
 );
 
 const CheckoutDeliveryPage = () => {
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, []);
+
     const { totalPrice } = useCart();
 
     return (

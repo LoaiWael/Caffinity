@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
@@ -9,6 +9,10 @@ const LoginPage = () => {
   const { login, loading } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
