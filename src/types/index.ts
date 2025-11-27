@@ -1,4 +1,4 @@
-import { Tables } from './supabase';
+import { Tables } from "./supabase";
 
 // Fake Store API types
 export interface FakeStoreProduct {
@@ -44,26 +44,26 @@ export type Category = {
 };
 
 // Legacy Supabase types (kept for compatibility)
-export type SupabaseProduct = Omit<Tables<'products'>, 'category_id'> & {
-    category: Tables<'categories'>;
-    rating: {
-        rate: number;
-        count: number;
-    }
+export type SupabaseProduct = Omit<Tables<"products">, "category_id"> & {
+  category: Tables<"categories">;
+  rating: {
+    rate: number;
+    count: number;
+  };
 };
 
-export type SupabaseCategory = Tables<'categories'>;
+export type SupabaseCategory = Tables<"categories">;
 
 export type CartItem = Product & {
   quantity: number;
 };
 
-export type Profile = Tables<'profiles'>;
+export type Profile = Tables<"profiles">;
 
-export type Order = Omit<Tables<'orders'>, 'user_id'> & {
-    order_items: (Omit<Tables<'order_items'>, 'product_id'> & {
-        products: Product | null;
-    })[]
+export type Order = Omit<Tables<"orders">, "user_id"> & {
+  order_items: (Omit<Tables<"order_items">, "product_id"> & {
+    products: Product | null;
+  })[];
 };
 
 export interface BlogPost {
