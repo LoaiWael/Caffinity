@@ -1,193 +1,128 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '../components/ui/Button';
-import { supabase } from '../lib/supabaseClient';
-import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+interface CheckoutFormData {
+    fullName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    notes: string;
+}
 
-const CheckoutForm = ({ clientSecret: _clientSecret }: { clientSecret: string }) => {
-    const stripe = useStripe();
-    const elements = useElements();
+interface FormErrors {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+}
+
+const CheckoutPaymentPage = () => {
+    const { totalPrice, cartCount, clearCart } = useCart();
     const navigate = useNavigate();
-    const { user } = useAuth();
-    const { cartItems, totalPrice, clearCart } = useCart();
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
+    const [formData, setFormData] = useState<CheckoutFormData>({
+        fullName: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        postalCode: '',
+        country: '',
+        notes: '',
+    });
 
-        if (!stripe || !elements) {
-            toast.error("Payment system is not ready. Please wait a moment and try again.");
-            return;
+    const [errors, setErrors] = useState<FormErrors>({});
+
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
+
+        if (!formData.fullName.trim()) {
+            newErrors.fullName = 'Full name is required';
+        } else if (formData.fullName.trim().length < 3) {
+            newErrors.fullName = 'Name must be at least 3 characters';
         }
 
-        if (!user) {
-            toast.error("You must be logged in to complete payment.");
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = 'Please enter a valid email address';
+        }
+
+        if (!formData.phone.trim()) {
+            newErrors.phone = 'Phone number is required';
+        } else if (!/^[\d\s\-+()]{8,}$/.test(formData.phone)) {
+            newErrors.phone = 'Please enter a valid phone number';
+        }
+
+        if (!formData.address.trim()) {
+            newErrors.address = 'Address is required';
+        } else if (formData.address.trim().length < 5) {
+            newErrors.address = 'Please enter a complete address';
+        }
+
+        if (!formData.city.trim()) {
+            newErrors.city = 'City is required';
+        }
+
+        if (!formData.postalCode.trim()) {
+            newErrors.postalCode = 'Postal code is required';
+        }
+
+        if (!formData.country.trim()) {
+            newErrors.country = 'Country is required';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+
+        if (errors[name as keyof FormErrors]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            toast.error("Please fix the errors in the form");
             return;
         }
 
         setIsLoading(true);
 
-        try {
-            // Submit the payment to Stripe
-            const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
-                elements,
-                confirmParams: {
-                    return_url: `${window.location.origin}/order-confirmation`,
-                },
-                redirect: 'if_required',
+        // Simulate order processing
+        setTimeout(() => {
+            const orderId = `ORD-${Date.now()}`;
+            toast.success("Order placed successfully!");
+            clearCart();
+            navigate('/order-confirmation', {
+                state: { orderId }
             });
-
-            if (stripeError) {
-                toast.error(stripeError.message || 'Payment failed. Please try again.');
-                setIsLoading(false);
-                return;
-            }
-
-            // Verify payment was successful
-            if (paymentIntent && paymentIntent.status === 'succeeded') {
-                // Payment successful, now create order in Supabase
-                const totalAmount = totalPrice + 3.95;
-                
-                // 1. Create the order
-                const { data: orderData, error: orderError } = await supabase
-                    .from('orders')
-                    .insert({
-                        user_id: user.id,
-                        total_amount: totalAmount,
-                        status: 'paid',
-                    })
-                    .select()
-                    .single();
-
-                if (orderError) {
-                    console.error("Order creation error:", orderError);
-                    throw new Error("Failed to create order record");
-                }
-
-                // 2. Create order items
-                const orderItems = cartItems.map(item => ({
-                    order_id: orderData.id,
-                    product_id: item.id,
-                    quantity: item.quantity,
-                    price_at_purchase: item.price,
-                }));
-
-                const { error: itemsError } = await supabase
-                    .from('order_items')
-                    .insert(orderItems);
-                
-                if (itemsError) {
-                    console.error("Order items error:", itemsError);
-                    throw new Error("Failed to save order items");
-                }
-
-                // 3. Clear cart and navigate
-                toast.success("Payment successful! Your order has been placed.");
-                clearCart();
-                navigate('/order-confirmation', { 
-                    state: { 
-                        orderId: orderData.id,
-                        paymentIntentId: paymentIntent.id 
-                    } 
-                });
-            } else {
-                toast.error("Payment processing failed. Please try again.");
-                setIsLoading(false);
-            }
-
-        } catch (dbError: any) {
-            console.error("Database error after payment:", dbError);
-            toast.error("Payment was successful, but we encountered an error saving your order. Please contact support with your payment confirmation.");
-            setIsLoading(false);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <PaymentElement />
-            <Button type="submit" className="w-full" disabled={isLoading || !stripe || !elements}>
-                {isLoading ? 'Processing...' : `Pay €${(totalPrice + 3.95).toFixed(2)}`}
-            </Button>
-        </form>
-    );
-};
-
-const CheckoutPaymentPage = () => {
-    const { totalPrice, cartCount, cartItems } = useCart();
-    const { user } = useAuth();
-    const [clientSecret, setClientSecret] = useState('');
-    const [loadingSecret, setLoadingSecret] = useState(true);
-
-    useEffect(() => {
-        if (cartCount === 0) {
-            setLoadingSecret(false);
-            return;
-        }
-
-        const createPaymentIntent = async () => {
-            setLoadingSecret(true);
-            try {
-                const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-                    body: { 
-                        amount: totalPrice + 3.95,
-                        userId: user?.id,
-                        cartItems: cartItems.map(item => ({
-                            id: item.id,
-                            title: item.title,
-                            quantity: item.quantity,
-                            price: item.price
-                        }))
-                    },
-                });
-
-                if (error) {
-                    console.error("Payment intent error:", error);
-                    throw error;
-                }
-                
-                if (data?.clientSecret) {
-                    setClientSecret(data.clientSecret);
-                } else {
-                    throw new Error("No client secret received");
-                }
-            } catch (err: any) {
-                console.error("Failed to create payment intent:", err);
-                toast.error(err.message || "Could not initialize payment. Please try again.");
-            } finally {
-                setLoadingSecret(false);
-            }
-        };
-        createPaymentIntent();
-    }, [totalPrice, cartCount, user?.id]);
-
-    const options = {
-        clientSecret,
-        appearance: {
-            theme: 'stripe',
-            variables: {
-                colorPrimary: '#282828',
-                colorBackground: '#FEFEFE',
-                colorText: '#282828',
-                colorDanger: '#BC575F',
-                fontFamily: 'Montserrat, sans-serif',
-                borderRadius: '0.375rem',
-            },
-        } as const,
+        }, 1000);
     };
 
     return (
         <div className="bg-brand-gray-light min-h-screen">
             <div className="container mx-auto px-6 py-12">
                 <div className="flex items-center justify-center space-x-4 md:space-x-8 mb-12">
-                    <Link to="/cart" >1. My Bag</Link>
+                    <Link to="/cart">1. My Bag</Link>
                     <div className="flex-grow h-px bg-brand-black"></div>
-                    <Link to="/checkout/delivery" >2. Delivery</Link>
+                    <Link to="/checkout/delivery">2. Delivery</Link>
                     <div className="flex-grow h-px bg-brand-black"></div>
                     <span className="font-semibold">3. Review & Payment</span>
                 </div>
@@ -195,7 +130,7 @@ const CheckoutPaymentPage = () => {
                 {cartCount === 0 ? (
                     <div className="text-center py-12">
                         <h2 className="font-heading text-2xl mb-4">Your cart is empty</h2>
-                        <p className="text-gray-600 mb-6">Add some items to your cart before proceeding to payment.</p>
+                        <p className="text-gray-600 mb-6">Add some items to your cart before proceeding to checkout.</p>
                         <Link to="/">
                             <Button>Continue Shopping</Button>
                         </Link>
@@ -203,28 +138,188 @@ const CheckoutPaymentPage = () => {
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         <div className="lg:col-span-2 bg-white p-8 space-y-6 rounded-lg shadow-sm">
-                            <h2 className="font-heading text-2xl">Payment Method</h2>
-                            
-                            {!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
-                                <div className="text-center text-brand-red p-4 bg-red-50 rounded-md">
-                                    Stripe is not configured. Please add your publishable key to the .env file.
-                                </div>
-                            )}
+                            <h2 className="font-heading text-2xl mb-6">Shipping Information</h2>
 
-                            {(loadingSecret || !clientSecret) && import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
-                                <div className="text-center py-8">
-                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-black"></div>
-                                    <p className="mt-4 text-gray-600">Loading payment form...</p>
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div>
+                                    <label htmlFor="fullName" className="block text-sm font-medium mb-2">
+                                        Full Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="fullName"
+                                        name="fullName"
+                                        value={formData.fullName}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black ${
+                                            errors.fullName ? 'border-red-500' : 'border-gray-300'
+                                        }`}
+                                        placeholder="John Doe"
+                                    />
+                                    {errors.fullName && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+                                    )}
                                 </div>
-                            )}
 
-                            {clientSecret && (
-                                <Elements stripe={stripePromise} options={options}>
-                                    <CheckoutForm clientSecret={clientSecret} />
-                                </Elements>
-                            )}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-medium mb-2">
+                                            Email *
+                                        </label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black ${
+                                                errors.email ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                            placeholder="john@example.com"
+                                        />
+                                        {errors.email && (
+                                            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                                            Phone *
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            name="phone"
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
+                                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black ${
+                                                errors.phone ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                            placeholder="+353 1 234 5678"
+                                        />
+                                        {errors.phone && (
+                                            <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <hr className="my-6" />
+
+                                <h3 className="font-heading text-xl mb-4">Shipping Address</h3>
+
+                                <div>
+                                    <label htmlFor="address" className="block text-sm font-medium mb-2">
+                                        Street Address *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="address"
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black ${
+                                            errors.address ? 'border-red-500' : 'border-gray-300'
+                                        }`}
+                                        placeholder="123 Main Street"
+                                    />
+                                    {errors.address && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="city" className="block text-sm font-medium mb-2">
+                                            City *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="city"
+                                            name="city"
+                                            value={formData.city}
+                                            onChange={handleInputChange}
+                                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black ${
+                                                errors.city ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                            placeholder="Dublin"
+                                        />
+                                        {errors.city && (
+                                            <p className="text-red-500 text-sm mt-1">{errors.city}</p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="postalCode" className="block text-sm font-medium mb-2">
+                                            Postal Code *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="postalCode"
+                                            name="postalCode"
+                                            value={formData.postalCode}
+                                            onChange={handleInputChange}
+                                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black ${
+                                                errors.postalCode ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                            placeholder="D01 F5P2"
+                                        />
+                                        {errors.postalCode && (
+                                            <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="country" className="block text-sm font-medium mb-2">
+                                        Country *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="country"
+                                        name="country"
+                                        value={formData.country}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black ${
+                                            errors.country ? 'border-red-500' : 'border-gray-300'
+                                        }`}
+                                        placeholder="Ireland"
+                                    />
+                                    {errors.country && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.country}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label htmlFor="notes" className="block text-sm font-medium mb-2">
+                                        Order Notes (optional)
+                                    </label>
+                                    <textarea
+                                        id="notes"
+                                        name="notes"
+                                        value={formData.notes}
+                                        onChange={handleInputChange}
+                                        rows={3}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-black"
+                                        placeholder="Special instructions for your order..."
+                                    />
+                                </div>
+
+                                <div className="bg-gray-50 p-4 rounded-md">
+                                    <p className="text-sm text-gray-600">
+                                        Payment will be collected upon delivery (Cash on Delivery)
+                                    </p>
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    className="w-full mt-6"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Processing...' : `Place Order - €${(totalPrice + 3.95).toFixed(2)}`}
+                                </Button>
+                            </form>
                         </div>
-                        
+
                         <div className="bg-white p-8 h-fit rounded-lg shadow-sm">
                             <h2 className="font-heading text-2xl mb-6">Order summary</h2>
                             <div className="space-y-4">

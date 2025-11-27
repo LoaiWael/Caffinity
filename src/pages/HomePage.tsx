@@ -16,25 +16,53 @@ const features = [
   { icon: Tag, text: "GREAT DEALS" },
 ];
 
-const categoryImages: { [key: string]: string } = {
-  electronics:
-    "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?q=80&w=1964&auto=format&fit=crop",
-  jewelery:
-    "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1887&auto=format&fit=crop",
-  "men's clothing":
-    "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1740&auto=format&fit=crop",
-  "women's clothing":
-    "https://images.unsplash.com/photo-1576185433388-958c2b598585?q=80&w=1887&auto=format&fit=crop",
-  books:
-    "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1887&auto=format&fit=crop",
-  home: "https://images.unsplash.com/photo-1556911220-bff31c812dba?q=80&w=2070&auto=format&fit=crop",
-  sports:
-    "https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=2070&auto=format&fit=crop",
-  toys: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=2070&auto=format&fit=crop",
-};
+const categories = [
+  {
+    id: 1,
+    name: "Hot Drinks",
+    image:
+      "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=400&fit=crop",
+  },
+  {
+    id: 2,
+    name: "Cold Drinks",
+    image:
+      "https://plus.unsplash.com/premium_photo-1677607237294-b041e4b57391?w=400&h=400&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: 3,
+    name: "Fresh Juices",
+    image:
+      "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=400&fit=crop",
+  },
+  {
+    id: 4,
+    name: "Smoothies",
+    image:
+      "https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=400&h=400&fit=crop",
+  },
+  {
+    id: 5,
+    name: "Milkshakes",
+    image:
+      "https://images.unsplash.com/photo-1641665271888-575e46923776?w=400&h=400&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: 6,
+    name: "Specialty Drinks",
+    image:
+      "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&h=400&fit=crop",
+  },
+  {
+    id: 7,
+    name: "Energy Drinks",
+    image:
+      "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop",
+  },
+];
 
 const HomePage = () => {
-  const { categories, products } = useProductsContext();
+  const { products } = useProductsContext();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -102,7 +130,7 @@ const HomePage = () => {
         <div className="container mx-auto px-6 text-center">
           <h2 className="font-heading text-4xl mb-12">Our Collections</h2>
           <div className="flex items-center justify-center flex-wrap gap-x-[5vw] gap-y-12">
-            {categories.slice(0, 8).map((cat) => (
+            {categories.map((cat) => (
               <Link
                 to={`/collections?category=${cat.name}`}
                 key={cat.id}
@@ -110,10 +138,7 @@ const HomePage = () => {
               >
                 <div className="bg-brand-gray-light aspect-square overflow-hidden rounded-full max-w-48">
                   <img
-                    src={
-                      categoryImages[cat.name] ||
-                      "https://img-wrapper.vercel.app/image?url=https://placehold.co/400x400.png"
-                    }
+                    src={cat.image}
                     alt={cat.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -136,8 +161,8 @@ const HomePage = () => {
             <Star className="h-8 w-8 text-brand-black" fill="currentColor" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
-            {mostPopularProducts.map((product) => (
-              <ProductCard product={product} />
+            {drinks.slice(0, 10).map((drink) => (
+              <ProductCard product={drink} key={drink.id} />
             ))}
           </div>
           <div className="text-center mt-12">
