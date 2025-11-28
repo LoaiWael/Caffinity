@@ -174,7 +174,7 @@ const HomePage = () => {
       </section>
 
       {/* Special Offers Section */}
-      <section className="py-20 bg-gradient-to-br from-brand-black to-brand-black/90 text-brand-white">
+      {/* <section className="py-20 bg-gradient-to-br from-brand-black to-brand-black/90 text-brand-white">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-center gap-3 mb-12">
             <h2 className="font-heading text-4xl text-center">
@@ -225,7 +225,7 @@ const HomePage = () => {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

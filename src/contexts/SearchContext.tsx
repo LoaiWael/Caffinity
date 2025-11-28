@@ -1,31 +1,47 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
-import { useProductsContext } from './ProductContext';
-import { Product } from '../types';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useMemo,
+} from "react";
+import drinksData from "../data/drinks_menu.json";
+
+interface Drink {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+}
 
 interface SearchContextType {
   isSearchOpen: boolean;
   setIsSearchOpen: React.Dispatch<React.SetStateAction<boolean>>;
   query: string;
   setQuery: React.Dispatch<React.SetStateAction<string>>;
-  filteredProducts: Product[];
+  filteredDrinks: Drink[];
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider = ({ children }: { children: ReactNode }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const { products } = useProductsContext();
+  const [query, setQuery] = useState("");
 
-  const filteredProducts = useMemo(() => {
+  const filteredDrinks = useMemo(() => {
     if (!query) return [];
-    return products.filter(product =>
-      product.title.toLowerCase().includes(query.toLowerCase())
+    return drinksData.filter(
+      (drink) =>
+        drink.name.toLowerCase().includes(query.toLowerCase()) ||
+        drink.description.toLowerCase().includes(query.toLowerCase())
     );
-  }, [query, products]);
+  }, [query]);
 
   return (
-    <SearchContext.Provider value={{ isSearchOpen, setIsSearchOpen, query, setQuery, filteredProducts }}>
+    <SearchContext.Provider
+      value={{ isSearchOpen, setIsSearchOpen, query, setQuery, filteredDrinks }}
+    >
       {children}
     </SearchContext.Provider>
   );
@@ -33,8 +49,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
 
 export const useSearch = () => {
   const context = useContext(SearchContext);
-  if (context === undefined) {
-    throw new Error('useSearch must be used within a SearchProvider');
-  }
+  if (!context)
+    throw new Error("useSearch must be used within a SearchProvider");
   return context;
 };

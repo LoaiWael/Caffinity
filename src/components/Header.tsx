@@ -13,8 +13,8 @@ const Header = () => {
 
   const navLinks = [
     { name: "Collections", path: "/collections" },
-    { name: "Hot Drinks", path: "/coffee" },
-    { name: "Cold Drinks", path: "/tea" },
+    { name: "Hot Drinks", path: "/hotdrinks" },
+    { name: "Cold Drinks", path: "/colddrinks" },
     { name: "Contact us", path: "/contact" },
   ];
 
