@@ -1,24 +1,58 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useProductsContext } from '../contexts/ProductContext';
-import ProductCard from '../components/ProductCard';
-import { ChevronDown, Plus, Minus } from 'lucide-react';
-import collectionBackground from '../assets/img/collection-background.webp';
+import React, { useState, useMemo, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import ProductCard from "../components/ProductCard";
+import { ChevronDown, Plus, Minus } from "lucide-react";
+import collectionBackground from "../assets/img/collection-background.webp";
+import drinksData from "../data/drinks_menu.json";
 
-const FilterSection = ({ title, children, defaultOpen = false }: { title: string, children: React.ReactNode, defaultOpen?: boolean }) => {
+interface Drink {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  currency: string;
+  image: string;
+  available: boolean;
+  rating: number;
+}
+
+const drinks: Drink[] = drinksData;
+
+// Filter components
+const FilterSection = ({
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
     <div className="border-b border-brand-gray-dark/50 py-4">
-      <button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between items-center">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center"
+      >
         <h3 className="font-semibold uppercase tracking-wider">{title}</h3>
         {isOpen ? <Minus size={20} /> : <Plus size={20} />}
       </button>
       {isOpen && <div className="mt-4 space-y-2">{children}</div>}
     </div>
-  )
-}
+  );
+};
 
-const FilterCheckbox = ({ label, isChecked, onChange }: { label: string, isChecked: boolean, onChange: (label: string) => void }) => (
+const FilterCheckbox = ({
+  label,
+  isChecked,
+  onChange,
+}: {
+  label: string;
+  isChecked: boolean;
+  onChange: (label: string) => void;
+}) => (
   <label className="flex items-center gap-3 cursor-pointer capitalize">
     <input
       type="checkbox"
@@ -28,10 +62,9 @@ const FilterCheckbox = ({ label, isChecked, onChange }: { label: string, isCheck
     />
     <span className="text-sm">{label}</span>
   </label>
-)
+);
 
 const CollectionsPage = () => {
-  const { products, categories, loading, error } = useProductsContext();
   const location = useLocation();
 
   useEffect(() => {
@@ -40,56 +73,59 @@ const CollectionsPage = () => {
 
   const getInitialCategory = () => {
     const params = new URLSearchParams(location.search);
-    const category = params.get('category');
+    const category = params.get("category");
     return category ? [category] : [];
   };
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(getInitialCategory);
-  const [sortOption, setSortOption] = useState<string>('default');
+  const [selectedCategories, setSelectedCategories] =
+    useState<string[]>(getInitialCategory);
+  const [sortOption, setSortOption] = useState<string>("default");
 
   useEffect(() => {
     setSelectedCategories(getInitialCategory());
   }, [location.search]);
 
-
   const handleCategoryChange = (categoryName: string) => {
-    setSelectedCategories(prev =>
+    setSelectedCategories((prev) =>
       prev.includes(categoryName)
-        ? prev.filter(c => c !== categoryName)
+        ? prev.filter((c) => c !== categoryName)
         : [...prev, categoryName]
     );
   };
 
+  // استخراج كل الكاتيجوريز من المشروبات
+  const categories = Array.from(new Set(drinks.map((d) => d.category)));
+
   const displayedProducts = useMemo(() => {
-    let filtered = products;
+    let filtered = drinks;
 
     if (selectedCategories.length > 0) {
-      filtered = products.filter(p => selectedCategories.includes(p.category.name));
+      filtered = drinks.filter((p) => selectedCategories.includes(p.category));
     }
 
     const sorted = [...filtered];
     switch (sortOption) {
-      case 'price-asc':
+      case "price-asc":
         sorted.sort((a, b) => a.price - b.price);
         break;
-      case 'price-desc':
+      case "price-desc":
         sorted.sort((a, b) => b.price - a.price);
         break;
-      case 'title-asc':
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
+      case "title-asc":
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
         break;
-      case 'title-desc':
-        sorted.sort((a, b) => b.title.localeCompare(a.title));
+      case "title-desc":
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
         break;
       default:
         break;
     }
 
     return sorted;
-  }, [products, selectedCategories, sortOption]);
+  }, [selectedCategories, sortOption]);
 
   return (
-    <div className='mt-[-7rem]'>
+    <div className="mt-[-7rem]">
       <section className="relative h-96 bg-brand-gray-light">
         <img
           src={collectionBackground}
@@ -97,22 +133,26 @@ const CollectionsPage = () => {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center pt-24">
-          <h1 className="font-heading text-5xl text-brand-white text-center">Our Collections</h1>
+          <h1 className="font-heading text-5xl text-brand-white text-center">
+            Our Drinks
+          </h1>
         </div>
       </section>
 
       <div className="container mx-auto px-6 py-12">
-        <p className="text-sm uppercase tracking-wider text-brand-black/70 mb-8">Home / Collections</p>
+        <p className="text-sm uppercase tracking-wider text-brand-black/70 mb-8">
+          Home / Collections
+        </p>
 
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Filters */}
           <aside className="lg:w-1/4">
             <FilterSection title="Categories" defaultOpen={true}>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <FilterCheckbox
-                  key={cat.id}
-                  label={cat.name}
-                  isChecked={selectedCategories.includes(cat.name)}
+                  key={cat}
+                  label={cat}
+                  isChecked={selectedCategories.includes(cat)}
                   onChange={handleCategoryChange}
                 />
               ))}
@@ -122,7 +162,9 @@ const CollectionsPage = () => {
           {/* Products Grid */}
           <main className="lg:w-3/4">
             <div className="flex justify-between items-center mb-6">
-              <p className="text-sm text-brand-black/70">{displayedProducts.length} products</p>
+              <p className="text-sm text-brand-black/70">
+                {displayedProducts.length} drinks
+              </p>
               <div className="relative">
                 <select
                   value={sortOption}
@@ -139,38 +181,17 @@ const CollectionsPage = () => {
               </div>
             </div>
 
-            {(loading && products.length === 0) && (
-              <div className="text-center py-20">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-brand-black mb-4"></div>
-                <p className="text-lg">Loading products...</p>
-                <p className="text-sm text-gray-500 mt-2">If this takes too long, check the console for errors</p>
+            {displayedProducts.length === 0 ? (
+              <div className="text-center py-20 col-span-full">
+                <p className="text-lg text-brand-black/70">
+                  No drinks match your current selection.
+                </p>
               </div>
-            )}
-            {error && (
-              <div className="text-center py-20">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-                  <p className="text-red-600 font-semibold mb-2">Error loading products</p>
-                  <p className="text-red-500 text-sm">{error}</p>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Retry
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {!loading && !error && (
+            ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12">
-                {displayedProducts.map(product => (
+                {displayedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
-              </div>
-            )}
-            {!loading && displayedProducts.length === 0 && (
-              <div className="text-center py-20 col-span-full">
-                <p className="text-lg text-brand-black/70">No products match your current selection.</p>
               </div>
             )}
           </main>

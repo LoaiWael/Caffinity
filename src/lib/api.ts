@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { FakeStoreProduct, Product, Category } from '../types';
+import axios from "axios";
+import { FakeStoreProduct, Product, Category } from "../types";
 
 // Base URL for Fake Store API
-const FAKE_STORE_API_BASE = 'https://fakestoreapi.com';
+const FAKE_STORE_API_BASE = "https://fakestoreapi.com";
 
 // Create axios instance with default config
 const api = axios.create({
@@ -15,11 +15,11 @@ const api = axios.create({
  */
 export const fetchProducts = async (): Promise<FakeStoreProduct[]> => {
   try {
-    const response = await api.get('/products');
+    const response = await api.get("/products");
     return response.data;
   } catch (error) {
-    console.error('Error fetching products:', error);
-    throw new Error('Failed to fetch products');
+    console.error("Error fetching products:", error);
+    throw new Error("Failed to fetch products");
   }
 };
 
@@ -41,18 +41,20 @@ export const fetchProduct = async (id: number): Promise<FakeStoreProduct> => {
  */
 export const fetchCategories = async (): Promise<string[]> => {
   try {
-    const response = await api.get('/products/categories');
+    const response = await api.get("/products/categories");
     return response.data;
   } catch (error) {
-    console.error('Error fetching categories:', error);
-    throw new Error('Failed to fetch categories');
+    console.error("Error fetching categories:", error);
+    throw new Error("Failed to fetch categories");
   }
 };
 
 /**
  * Fetch products by category
  */
-export const fetchProductsByCategory = async (category: string): Promise<FakeStoreProduct[]> => {
+export const fetchProductsByCategory = async (
+  category: string
+): Promise<FakeStoreProduct[]> => {
   try {
     const response = await api.get(`/products/category/${category}`);
     return response.data;
@@ -66,11 +68,13 @@ export const fetchProductsByCategory = async (category: string): Promise<FakeSto
  * Transform Fake Store API product to our internal Product type
  */
 export const transformFakeStoreProduct = (
-  fakeProduct: FakeStoreProduct, 
+  fakeProduct: FakeStoreProduct,
   categories: Category[]
 ): Product => {
-  const categoryObj = categories.find(cat => cat.name === fakeProduct.category);
-  
+  const categoryObj = categories.find(
+    (cat) => cat.name === fakeProduct.category
+  );
+
   return {
     id: fakeProduct.id,
     title: fakeProduct.title,
@@ -78,12 +82,12 @@ export const transformFakeStoreProduct = (
     description: fakeProduct.description,
     image: fakeProduct.image,
     rating: fakeProduct.rating,
-    category: categoryObj || { 
-      id: 0, 
-      name: fakeProduct.category, 
-      created_at: new Date().toISOString() 
+    category: categoryObj || {
+      id: 0,
+      name: fakeProduct.category,
+      created_at: new Date().toISOString(),
     },
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
   };
 };
 
@@ -94,28 +98,31 @@ export const transformCategories = (categoryNames: string[]): Category[] => {
   return categoryNames.map((name, index) => ({
     id: index + 1,
     name,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
   }));
 };
 
 /**
  * Fetch and transform all data for the application
  */
-export const fetchAllData = async (): Promise<{ products: Product[], categories: Category[] }> => {
+export const fetchAllData = async (): Promise<{
+  products: Product[];
+  categories: Category[];
+}> => {
   try {
     // Fetch categories first
     const categoryNames = await fetchCategories();
     const categories = transformCategories(categoryNames);
-    
+
     // Fetch products
     const fakeProducts = await fetchProducts();
-    const products = fakeProducts.map(product => 
+    const products = fakeProducts.map((product) =>
       transformFakeStoreProduct(product, categories)
     );
-    
+
     return { products, categories };
   } catch (error) {
-    console.error('Error fetching all data:', error);
+    console.error("Error fetching all data:", error);
     throw error;
   }
 };
