@@ -1,27 +1,19 @@
-import { Tables } from "./supabase";
+export type Category = "Hot Drinks" | "Cold Drinks" | "Fresh Juices" | "Smoothies" | "Milkshakes" | "Specialty Drinks" | "Energy Drinks";
 
-// Fake Store API types
-export interface Category {
+export interface Drink {
   id: number;
   name: string;
-  created_at?: string;
-}
-
-export interface Product {
-  id: number;
-  title: string;
   description: string | null;
   price: number;
+  currency: string;
   image: string | null;
   created_at?: string;
-  category: Category;
-  rating: {
-    rate: number;
-    count: number;
-  };
+  category: Category | string;
+  rating: number;
+  available: boolean;
 }
 
-export type CartItem = Product & {
+export type CartItem = Drink & {
   quantity: number;
 };
 
@@ -37,7 +29,7 @@ export interface OrderItem {
   order_id: number;
   quantity: number;
   price_at_purchase: number;
-  products: Product | null;
+  products: Drink | null;
 }
 
 export interface Order {
@@ -49,99 +41,7 @@ export interface Order {
   order_items: OrderItem[];
 }
 
-export interface BlogPost {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  date: string;
-  featured?: boolean;
-}
-
 export interface MockUser {
   id: string;
   email: string;
-}
-
-// Legacy API types (kept for compatibility)
-export interface FakeStoreProduct {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
-}
-
-export interface FakeStoreCategory {
-  id: number;
-  name: string;
-}
-
-// Converted types to match existing structure
-export type Product = {
-  id: number;
-  title: string;
-  price: number;
-  description: string | null;
-  image: string | null;
-  rating: {
-    rate: number;
-    count: number;
-  };
-  category: {
-    id: number;
-    name: string;
-  };
-  created_at?: string;
-};
-
-export type Category = {
-  id: number;
-  name: string;
-  created_at?: string;
-};
-
-// Legacy Supabase types (kept for compatibility)
-export type SupabaseProduct = Omit<Tables<"products">, "category_id"> & {
-  category: Tables<"categories">;
-  rating: {
-    rate: number;
-    count: number;
-  };
-};
-
-export type SupabaseCategory = Tables<"categories">;
-
-export type CartItem = Product & {
-  quantity: number;
-};
-
-export type Profile = Tables<"profiles">;
-
-export type Order = Omit<Tables<"orders">, "user_id"> & {
-  order_items: (Omit<Tables<"order_items">, "product_id"> & {
-    products: Product | null;
-  })[];
-};
-
-export interface BlogPost {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  date: string;
-  featured?: boolean;
 }
