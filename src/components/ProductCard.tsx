@@ -1,19 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
+import type { Drink } from "../types";
 import addToBag from "../assets/svg/add-to-shopping-bag.svg";
-
-interface Drink {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  price: number;
-  currency: string;
-  image: string;
-  available: boolean;
-  rating: number; // رقم فقط
-}
 
 interface ProductCardProps {
   product: Drink;
@@ -43,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       >
         <div className="bg-brand-gray-light w-full aspect-square overflow-hidden mb-4 rounded-lg">
           <img
-            src={product.image}
+            src={product.image!}
             alt={product.name}
             className="w-full h-full object-cover object-center transition-transform duration-300"
           />
