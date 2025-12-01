@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
-import { X, Plus, Minus } from 'lucide-react';
+import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,19 +41,19 @@ const CartOverlay = () => {
                 <div className="flex-grow overflow-y-auto p-6 space-y-4">
                   {cartItems.map(item => (
                     <div key={item.id} className="flex gap-4">
-                      <img src={item.image} alt={item.title} className="w-24 h-24 object-cover bg-brand-gray-light" />
+                      <img src={item.image!} alt={item.name} className="w-24 h-24 object-cover bg-brand-gray-light rounded-md" />
                       <div className="flex-grow flex flex-col justify-between">
                         <div>
-                          <h3 className="font-medium text-sm leading-tight">{item.title}</h3>
+                          <h3 className="font-medium text-sm leading-tight">{item.name}</h3>
                           <p className="text-sm font-semibold mt-1">€{item.price.toFixed(2)}</p>
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                          <div className="flex items-center border border-brand-gray rounded">
+                          <div className="flex items-center border border-brand-gray rounded-lg">
                             <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1.5"><Minus size={16} /></button>
                             <span className="px-3 text-sm">{item.quantity}</span>
                             <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1.5"><Plus size={16} /></button>
                           </div>
-                          <button onClick={() => removeFromCart(item.id)} className="text-xs uppercase tracking-wider text-brand-black/50 hover:text-brand-red">Remove</button>
+                          <button onClick={() => removeFromCart(item.id)} className="text-xs uppercase tracking-wider text-brand-red bg-brand-red/15 hover:opacity-60 transition rounded-xl p-2 shadow-sm shadow-brand-gray-dark/20"><Trash2 size={20} /></button>
                         </div>
                       </div>
                     </div>
