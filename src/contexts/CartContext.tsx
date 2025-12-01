@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { CartItem, Product } from '../types';
+import { CartItem, Drink } from '../types';
 import toast from 'react-hot-toast';
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Drink, quantity?: number) => void;
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   clearCart: () => void;
@@ -28,7 +28,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }
 
-  const addToCart = (product: Product, quantityToAdd: number = 1) => {
+  const addToCart = (product: Drink, quantityToAdd: number = 1) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
@@ -38,7 +38,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
       return [...prevItems, { ...product, quantity: quantityToAdd }];
     });
-    toast.success(`${product.title} added to cart!`);
+    toast.success(`${product.name} added to cart!`);
     setIsCartOpen(true);
   };
 
@@ -46,7 +46,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems(prevItems => {
       const itemToRemove = prevItems.find(item => item.id === productId);
       if (itemToRemove) {
-        toast.error(`${itemToRemove.title} removed from cart.`);
+        toast.error(`${itemToRemove.name} removed from cart.`);
       }
       return prevItems.filter(item => item.id !== productId)
     });

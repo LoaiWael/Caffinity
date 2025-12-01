@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FakeStoreProduct, Product, Category } from "../types";
+import { FakeStoreProduct, Drink, Category } from "../types";
 
 // Base URL for Fake Store API
 const FAKE_STORE_API_BASE = "https://fakestoreapi.com";
@@ -70,7 +70,7 @@ export const fetchProductsByCategory = async (
 export const transformFakeStoreProduct = (
   fakeProduct: FakeStoreProduct,
   categories: Category[]
-): Product => {
+): Drink => {
   const categoryObj = categories.find(
     (cat) => cat.name === fakeProduct.category
   );
@@ -106,7 +106,7 @@ export const transformCategories = (categoryNames: string[]): Category[] => {
  * Fetch and transform all data for the application
  */
 export const fetchAllData = async (): Promise<{
-  products: Product[];
+  products: Drink[];
   categories: Category[];
 }> => {
   try {
