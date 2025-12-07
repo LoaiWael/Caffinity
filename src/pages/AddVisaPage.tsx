@@ -19,16 +19,22 @@ export default function VisaPaymentForm() {
   const location = useLocation();
   const orderId = location.state?.orderId;
   const shippingAddress = location.state?.shippingAddress;
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{
+    cardNumber?: string;
+    cardHolder?: string;
+    expiryMonth?: string;
+    expiryYear?: string;
+    cvv?: string;
+  }>({});
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
-  const formatCardNumber = (value) => {
+  const formatCardNumber = (value: string) => {
     const cleaned = value.replace(/\s/g, '');
     const chunks = cleaned.match(/.{1,4}/g);
     return chunks ? chunks.join(' ') : cleaned;
   };
 
-  const handleCardNumberChange = (e) => {
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\s/g, '');
     if (value.length <= 16 && /^\d*$/.test(value)) {
       setCardData({ ...cardData, cardNumber: value });
@@ -36,7 +42,7 @@ export default function VisaPaymentForm() {
     }
   };
 
-  const handleCardHolderChange = (e) => {
+  const handleCardHolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toUpperCase();
     if (/^[A-Z\s]*$/.test(value)) {
       setCardData({ ...cardData, cardHolder: value });
@@ -44,7 +50,7 @@ export default function VisaPaymentForm() {
     }
   };
 
-  const handleCVVChange = (e) => {
+  const handleCVVChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value.length <= 3 && /^\d*$/.test(value)) {
       setCardData({ ...cardData, cvv: value });
@@ -53,7 +59,13 @@ export default function VisaPaymentForm() {
   };
 
   const validateCard = () => {
-    const newErrors = {};
+    const newErrors: {
+      cardNumber?: string;
+      cardHolder?: string;
+      expiryMonth?: string;
+      expiryYear?: string;
+      cvv?: string;
+    } = {};
 
     if (!cardData.cardNumber) {
       newErrors.cardNumber = 'Card number is required';
@@ -310,7 +322,7 @@ export default function VisaPaymentForm() {
                       value={cardData.cvv}
                       onChange={handleCVVChange}
                       placeholder="123"
-                      maxLength="3"
+                      maxLength={3}
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${errors.cvv ? 'border-red-500' : 'border-gray-300'
                         }`}
                     />
