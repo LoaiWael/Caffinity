@@ -8,9 +8,11 @@ import  {
 import toast from "react-hot-toast";
 
 interface User {
+  id: string;
   email: string;
   firstName?: string;
   lastName?: string;
+  password?: string;
 }
 
 interface AuthContextType {
@@ -25,6 +27,7 @@ interface AuthContextType {
     lastName: string;
   }) => Promise<void>;
   logout: () => void;
+  updateProfile: (updates: { firstName: string; lastName: string }) => void;
   loading: boolean;
 }
 
@@ -90,10 +93,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (users.find((u: any) => u.email === email)) {
       toast.error("Email already exists");
       setLoading(false);
-      return false;
+      return;
     }
 
-    const newUser = { email, password, firstName, lastName };
+    const newUser = { 
+      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      email, 
+      password, 
+      firstName, 
+      lastName 
+    };
 
     users.push(newUser);
     localStorage.setItem("all_users", JSON.stringify(users));
@@ -105,7 +114,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     toast.success("Account created successfully!");
     setLoading(false);
-    return true;
+  };
+
+  // ---------------------------------------------
+  // UPDATE PROFILE
+  // ---------------------------------------------
+  const updateProfile = ({ firstName, lastName }: { firstName: string; lastName: string }) => {
+    if (!user) return;
+
+    const updatedUser = { ...user, firstName, lastName };
+    
+    // Update in all_users
+    const users = JSON.parse(localStorage.getItem("all_users") || "[]");
+    const updatedUsers = users.map((u: User) => 
+      u.id === user.id ? updatedUser : u
+    );
+    localStorage.setItem("all_users", JSON.stringify(updatedUsers));
+    
+    // Update current session
+    localStorage.setItem("auth_user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    setProfile(updatedUser);
+    
+    toast.success("Profile updated successfully!");
   };
 
   // ---------------------------------------------
@@ -127,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         signUp,
         logout,
+        updateProfile,
         loading,
       }}
     >

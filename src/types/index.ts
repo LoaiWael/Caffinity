@@ -26,19 +26,36 @@ export interface Profile {
 
 export interface OrderItem {
   id: number;
-  order_id: number;
+  productId: number;
+  name: string;
   quantity: number;
-  price_at_purchase: number;
-  products: Drink | null;
+  price: number;
+  image: string | null;
 }
 
 export interface Order {
-  id: number;
+  id: string;
+  userId: string;
   created_at: string;
   total_amount: number;
   status: string;
-  shipping_address: unknown | null;
+  shipping_address: Address | null;
   order_items: OrderItem[];
+}
+
+export interface Address {
+  id: string;
+  userId: string;
+  label: string;
+  fullName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone: string;
+  isDefault: boolean;
 }
 
 export interface MockUser {

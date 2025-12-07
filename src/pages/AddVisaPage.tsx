@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { CreditCard, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
+import type { Order, OrderItem } from '../types';
+
 export default function VisaPaymentForm() {
   const [cardData, setCardData] = useState({
     cardNumber: '',
@@ -12,9 +14,11 @@ export default function VisaPaymentForm() {
     expiryYear: '',
     cvv: ''
   });
-  const {clearCart} = useCart();
+  const { clearCart, cartItems, totalPrice } = useCart();
+  const { user } = useAuth();
   const location = useLocation();
   const orderId = location.state?.orderId;
+  const shippingAddress = location.state?.shippingAddress;
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
@@ -104,11 +108,38 @@ export default function VisaPaymentForm() {
 
     // Simulate payment processing
     setTimeout(() => {
+      // Save order to localStorage
+      if (user) {
+        const orderItems: OrderItem[] = cartItems.map((item, index) => ({
+          id: index + 1,
+          productId: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          image: item.image,
+        }));
+
+        const newOrder: Order = {
+          id: orderId,
+          userId: user.id,
+          created_at: new Date().toISOString(),
+          total_amount: totalPrice,
+          status: 'processing',
+          shipping_address: shippingAddress || null,
+          order_items: orderItems,
+        };
+
+        // Get existing orders and add new one
+        const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+        allOrders.push(newOrder);
+        localStorage.setItem('all_orders', JSON.stringify(allOrders));
+      }
+
       setIsProcessing(false);
       toast.success("Order placed successfully!");
       clearCart();
       navigate('/order-confirmation', {
-          state: { orderId }
+        state: { orderId }
       });
     }, 2000);
   };

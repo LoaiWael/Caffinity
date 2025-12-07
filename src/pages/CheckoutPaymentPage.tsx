@@ -108,10 +108,21 @@ const CheckoutPaymentPage = () => {
         // Simulate order processing
         setTimeout(() => {
             const orderId = `ORD-${Date.now()}`;
-            toast.success("Order placed successfully!");
-            clearCart();
+            const shippingAddress = {
+                fullName: formData.fullName,
+                addressLine1: formData.address,
+                city: formData.city,
+                postalCode: formData.postalCode,
+                country: formData.country,
+                phone: formData.phone,
+            };
+            
+            setIsLoading(false);
             navigate('/add-visa', {
-                state: { orderId }
+                state: { 
+                    orderId,
+                    shippingAddress 
+                }
             });
         }, 1000);
     };
