@@ -20,7 +20,6 @@ const LoginPage = () => {
 
     await login({ email, password });
 
-    // بعد ما login تنجح أو toast تظهر لو فشل
     const savedUser = localStorage.getItem("auth_user");
     if (savedUser) {
       navigate("/account");

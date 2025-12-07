@@ -58,24 +58,11 @@ const categories = [
 ];
 
 const HomePage = () => {
-  // const { products } = useProductsContext();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // const mostPopularProducts = [...products]
-  //   .sort((a, b) => b.rating.count - a.rating.count)
-  //   .slice(0, 8);
-
-  // const discountedProducts = [...products]
-  //   .filter((p) => p.rating.rate >= 4.0)
-  //   .sort((a, b) => b.rating.rate - a.rating.rate)
-  //   .slice(0, 4);
-
-  // const calculateDiscount = (price: number) => {
-  //   return (price * 0.8).toFixed(2);
-  // };
 
   const drinks = drinksData;
 
@@ -100,7 +87,7 @@ const HomePage = () => {
           </div>
           <div className="lg:absolute lg:right-0 lg:top-0 lg:w-1/2 lg:h-full w-full mt-8 lg:mt-0 px-4 h-auto">
             <img
-              src="src/assets/img/drinks-photo.webp"
+              src="/assets/img/drinks-photo.webp"
               alt="Featured products"
               className="w-full lg:h-[80vh] object-cover rounded-3xl"
             />
@@ -173,60 +160,6 @@ const HomePage = () => {
             </div>
           </div>
         </section>
-
-        {/* Special Offers Section */}
-        {/* <section className="py-20 bg-gradient-to-br from-brand-black to-brand-black/90 text-brand-white">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-center gap-3 mb-12">
-            <h2 className="font-heading text-4xl text-center">
-              Special Offers
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
-            {discountedProducts.map((product) => (
-              <div key={product.id} className="relative group">
-                <Link
-                  to={`/products/${product.id}`}
-                  className="flex flex-col items-center text-center"
-                >
-                  <div className="bg-brand-white/10 w-full aspect-square overflow-hidden mb-4 rounded-lg relative">
-                    <img
-                      src={product.image || ""}
-                      alt={product.title}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-2 left-2 bg-brand-red text-brand-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
-                      <Percent className="h-4 w-4" />
-                      20% OFF
-                    </div>
-                  </div>
-                  <h3 className="text-base font-medium uppercase mb-1 h-12 overflow-hidden text-brand-white">
-                    {product.title}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <p className="text-lg font-semibold text-brand-white">
-                      €{calculateDiscount(product.price)}
-                    </p>
-                    <p className="text-sm text-brand-white/60 line-through">
-                      €{product.price.toFixed(2)}
-                    </p>
-                  </div>
-                </Link>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-12">
-            <Button
-              variant="outline"
-              className="border-brand-white text-brand-white hover:bg-brand-white hover:text-brand-black"
-              asChild
-              to="/collections"
-            >
-              Shop All Deals
-            </Button>
-          </div>
-        </div>
-      </section> */}
       </div>
     </>
   );

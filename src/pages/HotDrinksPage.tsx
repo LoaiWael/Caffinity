@@ -7,7 +7,6 @@ const HotDrinksPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // فلترة المشروبات لتكون فقط Hot Drinks
   const hotDrinksProducts = drinksData.filter(
     (drink) => drink.category === "Hot Drinks"
   );

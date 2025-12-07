@@ -7,7 +7,6 @@ import { useCart } from "../contexts/CartContext";
 import drinksData from "../data/drinks_menu.json";
 import type { Drink } from "../types";
 
-// استخدام البيانات
 const drinks: Drink[] = drinksData;
 
 const ProductDetailPage: React.FC = () => {
@@ -99,7 +98,7 @@ const ProductDetailPage: React.FC = () => {
                 </button>
               </div>
               <Button onClick={handleAddToCart} className="flex-grow rounded-xl" title="Add to Bag">
-                <img src="../src/assets/svg/add-to-shopping-bag.svg" className="sm:hidden w-6 aspect-square invert" /><ShoppingBag size={20} className="hidden sm:inline mr-2" /> <span className="hidden sm:inline">Add to Bag</span>
+                <img src="/assets/svg/add-to-shopping-bag.svg" className="sm:hidden w-6 aspect-square invert" /><ShoppingBag size={20} className="hidden sm:inline mr-2" /> <span className="hidden sm:inline">Add to Bag</span>
               </Button>
             </div>
             <div className="flex flex-row items-center gap-2">

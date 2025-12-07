@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import type { Drink } from "../types";
-import addToBag from "../assets/svg/add-to-shopping-bag.svg";
 
 interface ProductCardProps {
   product: Drink;
@@ -68,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         title="Add to Bag"
         onClick={() => addToCart(product, 1)}
       >
-        <img className="w-7 aspect-square" src={addToBag} alt="Add to Bag" />
+        <img className="w-7 aspect-square" src={'/assets/svg/add-to-shopping-bag.svg'} alt="Add to Bag" />
       </button>
     </div>
   );

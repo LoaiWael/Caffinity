@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { ChevronDown, Plus, Minus } from "lucide-react";
-import collectionBackground from "../assets/img/collection-background.webp";
 import drinksData from "../data/drinks_menu.json";
 
 interface Drink {
@@ -167,7 +166,7 @@ const CollectionsPage = () => {
       <div className="mt-[-7rem]">
         <section className="relative h-96 bg-brand-gray-light">
           <img
-            src={collectionBackground}
+            src={"/assets/img/collection-background.webp"}
             alt="Collections"
             className="w-full h-full object-cover"
           />
