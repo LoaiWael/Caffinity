@@ -110,7 +110,7 @@ const CheckoutPaymentPage = () => {
             const orderId = `ORD-${Date.now()}`;
             toast.success("Order placed successfully!");
             clearCart();
-            navigate('/order-confirmation', {
+            navigate('/add-visa', {
                 state: { orderId }
             });
         }, 1000);
