@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import ProductCard from "../components/ProductCard";
-import drinksData from "../data/drinks_menu.json"; // استيراد بيانات المشروبات
+import drinksData from "../data/drinks_menu.json"; 
 
 const ColdDrinksPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // فلترة المشروبات لتكون فقط Cold Drinks
   const coldDrinksProducts = drinksData.filter(
     (drink) => drink.category !== "Hot Drinks"
   );

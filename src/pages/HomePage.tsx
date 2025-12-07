@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
-import { Coffee, Award, Truck, Tag, Star, Percent } from "lucide-react";
-// import { useProductsContext } from "../contexts/ProductContext";
+import { Coffee, Award, Truck, Tag, Star,  } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import drinksData from "../data/drinks_menu.json";
 
