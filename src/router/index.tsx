@@ -16,6 +16,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import RouteErrorPage from "../pages/RouteErrorPage";
 import HotDrinksPage from "../pages/HotDrinksPage";
 import ColdDrinksPage from "../pages/ColdDrinksPage";
+import AddVisaPage from "../pages/AddVisaPage";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
           { path: "checkout/delivery", element: <CheckoutDeliveryPage /> },
           { path: "checkout/payment", element: <CheckoutPaymentPage /> },
           { path: "order-confirmation", element: <OrderConfirmationPage /> },
+          { path: "add-visa", element: <AddVisaPage /> },
           { path: "account", element: <AccountPage /> },
         ],
       },
