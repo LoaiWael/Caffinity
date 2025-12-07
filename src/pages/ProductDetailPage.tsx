@@ -113,6 +113,8 @@ const ProductDetailPage: React.FC = () => {
               </div></div>
           </div>
         </div>
+        
+        
 
         {relatedProducts.length > 0 && (
           <section className="py-20 border-t border-brand-gray">
