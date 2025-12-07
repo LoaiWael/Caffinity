@@ -2,13 +2,10 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Coffee, Award, Truck, Tag, Star, Percent } from "lucide-react";
-import { useProductsContext } from "../contexts/ProductContext";
+// import { useProductsContext } from "../contexts/ProductContext";
 import ProductCard from "../components/ProductCard";
 import drinksData from "../data/drinks_menu.json";
 
-// استخدام البيانات
-const drinks = drinksData;
-console.log(drinks); // هيطبع كل المشروبات
 const features = [
   { icon: Coffee, text: "WIDE SELECTION" },
   { icon: Award, text: "TOP QUALITY PRODUCTS" },
@@ -62,119 +59,124 @@ const categories = [
 ];
 
 const HomePage = () => {
-  const { products } = useProductsContext();
+  // const { products } = useProductsContext();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const mostPopularProducts = [...products]
-    .sort((a, b) => b.rating.count - a.rating.count)
-    .slice(0, 8);
+  // const mostPopularProducts = [...products]
+  //   .sort((a, b) => b.rating.count - a.rating.count)
+  //   .slice(0, 8);
 
-  const discountedProducts = [...products]
-    .filter((p) => p.rating.rate >= 4.0)
-    .sort((a, b) => b.rating.rate - a.rating.rate)
-    .slice(0, 4);
+  // const discountedProducts = [...products]
+  //   .filter((p) => p.rating.rate >= 4.0)
+  //   .sort((a, b) => b.rating.rate - a.rating.rate)
+  //   .slice(0, 4);
 
-  const calculateDiscount = (price: number) => {
-    return (price * 0.8).toFixed(2);
-  };
+  // const calculateDiscount = (price: number) => {
+  //   return (price * 0.8).toFixed(2);
+  // };
+
+  const drinks = drinksData;
 
   return (
-    <div className="bg-brand-white">
-      {/* Hero Section */}
-      <section className="relative container mx-auto mt-3 flex flex-col lg:flex-row items-center justify-center lg:justify-start py-20 lg:py-0 lg:h-[calc(100vh-6rem)]">
-        <div className="lg:w-1/2 text-center lg:text-left z-10 p-8">
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-brand-black mb-6">
-            Taste the perfect moment.
-          </h1>
-          <p className="text-brand-black/80 mb-8 max-w-md mx-auto lg:mx-0">
-            Your daily dose of delicious. Shop the finest coffees and teas,
-            delivered right to your door.
-          </p>
-          <Button asChild to="/collections">
-            Browse Collections
-          </Button>
-        </div>
-        <div className="lg:absolute lg:right-0 lg:top-0 lg:w-1/2 lg:h-full w-full mt-8 lg:mt-0 px-4 h-auto">
-          <img
-            src="src/assets/img/drinks-photo.webp"
-            alt="Featured products"
-            className="w-full lg:h-[80vh] object-cover rounded-3xl"
-          />
-        </div>
-      </section>
+    <>
+      <title>Caffinity</title>
 
-      {/* Features Section */}
-      <section className="bg-brand-gray-light py-12">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="flex flex-col sm:flex-row items-center gap-4 justify-center"
-              >
-                <feature.icon className="h-8 w-8 text-brand-black" />
-                <p className="font-semibold text-sm uppercase tracking-wider">
-                  {feature.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Collections Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="font-heading text-4xl mb-12">Our Collections</h2>
-          <div className="flex items-center justify-center flex-wrap gap-x-[5vw] gap-y-12">
-            {categories.map((cat) => (
-              <Link
-                to={`/collections?category=${cat.name}`}
-                key={cat.id}
-                className="group"
-              >
-                <div className="bg-brand-gray-light aspect-square overflow-hidden rounded-full max-w-48">
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <h3 className="mt-4 font-semibold tracking-wider capitalize">
-                  {cat.name}
-                </h3>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Most Popular Section */}
-      <section className="bg-brand-gray-light py-20">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-center gap-3 mb-12">
-            <Star className="h-8 w-8 text-brand-black" fill="currentColor" />
-            <h2 className="font-heading text-4xl text-center">Most Popular</h2>
-            <Star className="h-8 w-8 text-brand-black" fill="currentColor" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
-            {drinks.slice(0, 10).map((drink) => (
-              <ProductCard product={drink} key={drink.id} />
-            ))}
-          </div>
-          <div className="text-center mt-12">
+      <div className="bg-brand-white">
+        {/* Hero Section */}
+        <section className="relative container mx-auto mt-3 flex flex-col lg:flex-row items-center justify-center lg:justify-start py-20 lg:py-0 lg:h-[calc(100vh-6rem)]">
+          <div className="lg:w-1/2 text-center lg:text-left z-10 p-8">
+            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-brand-black mb-6">
+              Taste the perfect moment.
+            </h1>
+            <p className="text-brand-black/80 mb-8 max-w-md mx-auto lg:mx-0">
+              Your daily dose of delicious. Order your finest drink,
+              delivered right to your door.
+            </p>
             <Button asChild to="/collections">
-              View All Products
+              Browse Collections
             </Button>
           </div>
-        </div>
-      </section>
+          <div className="lg:absolute lg:right-0 lg:top-0 lg:w-1/2 lg:h-full w-full mt-8 lg:mt-0 px-4 h-auto">
+            <img
+              src="src/assets/img/drinks-photo.webp"
+              alt="Featured products"
+              className="w-full lg:h-[80vh] object-cover rounded-3xl"
+            />
+          </div>
+        </section>
 
-      {/* Special Offers Section */}
-      {/* <section className="py-20 bg-gradient-to-br from-brand-black to-brand-black/90 text-brand-white">
+        {/* Features Section */}
+        <section className="bg-brand-gray-light py-12">
+          <div className="container mx-auto px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col sm:flex-row items-center gap-4 justify-center"
+                >
+                  <feature.icon className="h-8 w-8 text-brand-black" />
+                  <p className="font-semibold text-sm uppercase tracking-wider">
+                    {feature.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Collections Section */}
+        <section className="py-20">
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="font-heading text-4xl mb-12">Our Collections</h2>
+            <div className="flex items-center justify-center flex-wrap gap-x-[5vw] gap-y-12">
+              {categories.map((cat) => (
+                <Link
+                  to={`/collections?category=${cat.name}`}
+                  key={cat.id}
+                  className="group"
+                >
+                  <div className="bg-brand-gray-light aspect-square overflow-hidden rounded-full max-w-48">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <h3 className="mt-4 font-semibold tracking-wider capitalize">
+                    {cat.name}
+                  </h3>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Most Popular Section */}
+        <section className="bg-brand-gray-light py-20">
+          <div className="container mx-auto px-6">
+            <div className="flex items-center justify-center gap-3 mb-12">
+              <Star className="h-8 w-8 text-brand-black" fill="currentColor" />
+              <h2 className="font-heading text-4xl text-center">Most Popular</h2>
+              <Star className="h-8 w-8 text-brand-black" fill="currentColor" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
+              {drinks.slice(0, 10).map((drink) => (
+                <ProductCard product={drink} key={drink.id} />
+              ))}
+            </div>
+            <div className="text-center mt-12">
+              <Button asChild to="/collections">
+                View All Products
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Special Offers Section */}
+        {/* <section className="py-20 bg-gradient-to-br from-brand-black to-brand-black/90 text-brand-white">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-center gap-3 mb-12">
             <h2 className="font-heading text-4xl text-center">
@@ -226,7 +228,8 @@ const HomePage = () => {
           </div>
         </div>
       </section> */}
-    </div>
+      </div>
+    </>
   );
 };
 

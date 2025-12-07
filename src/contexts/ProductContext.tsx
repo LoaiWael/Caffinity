@@ -5,11 +5,11 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { Product, Category } from "../types";
+import { Drink, Category } from "../types";
 import { fetchAllData } from "../lib/api";
 
 interface ProductContextType {
-  products: Product[];
+  products: Drink[];
   categories: Category[];
   loading: boolean;
   error: string | null;
@@ -18,7 +18,7 @@ interface ProductContextType {
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Drink[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         console.error("❌ Error fetching data from Fake Store API:", err);
         setError(
           err.message ||
-            "Failed to fetch products or categories from Fake Store API."
+          "Failed to fetch products or categories from Fake Store API."
         );
       } finally {
         setLoading(false);

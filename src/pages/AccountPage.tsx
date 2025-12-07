@@ -63,11 +63,10 @@ const AccountPage = () => {
   }) => (
     <button
       onClick={() => setActiveTab(tab)}
-      className={`flex items-center gap-3 w-full text-left px-4 py-3 rounded-md transition-colors ${
-        activeTab === tab
-          ? "bg-brand-gray-light text-brand-black font-semibold"
-          : "hover:bg-brand-gray-light text-brand-black/70"
-      }`}
+      className={`flex items-center gap-3 w-full text-left px-4 py-3 rounded-md transition-colors ${activeTab === tab
+        ? "bg-brand-gray-light text-brand-black font-semibold"
+        : "hover:bg-brand-gray-light text-brand-black/70"
+        }`}
     >
       <Icon className="h-5 w-5" />
       <span>{label}</span>
@@ -75,38 +74,42 @@ const AccountPage = () => {
   );
 
   return (
-    <div className="bg-brand-gray-light min-h-[calc(100vh-12rem)]">
-      <div className="container mx-auto px-6 py-12">
-        <h1 className="font-heading text-4xl mb-8">My Account</h1>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <aside className="md:col-span-1 bg-white p-4 rounded-lg shadow-sm h-fit">
-            <nav className="space-y-2">
-              <NavItem tab="dashboard" icon={User} label="Dashboard" />
-              <NavItem tab="orders" icon={ShoppingBag} label="Orders" />
-              <NavItem tab="profile" icon={User} label="Profile Details" />
-              <NavItem tab="addresses" icon={MapPin} label="Addresses" />
-              <button
-                onClick={() => {
-                  const conf = window.confirm(
-                    "Are you sure you want to logout?"
-                  );
-                  if (!conf) return;
-                  logout();
-                  navigate("/");
-                }}
-                className="flex items-center gap-3 w-full text-left px-4 py-3 rounded-md transition-colors hover:bg-brand-gray-light text-brand-black/70"
-              >
-                <LogOut className="h-5 w-5" />
-                <span>Logout</span>
-              </button>
-            </nav>
-          </aside>
-          <main className="md:col-span-3 bg-white p-8 rounded-lg shadow-sm">
-            {renderContent()}
-          </main>
+    <>
+      <title>Caffinity - {profile.firstName} Account</title>
+
+      <div className="bg-brand-gray-light min-h-[calc(100vh-12rem)]">
+        <div className="container mx-auto px-6 py-12">
+          <h1 className="font-heading text-4xl mb-8">My Account</h1>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <aside className="md:col-span-1 bg-white p-4 rounded-lg shadow-sm h-fit">
+              <nav className="space-y-2">
+                <NavItem tab="dashboard" icon={User} label="Dashboard" />
+                <NavItem tab="orders" icon={ShoppingBag} label="Orders" />
+                <NavItem tab="profile" icon={User} label="Profile Details" />
+                <NavItem tab="addresses" icon={MapPin} label="Addresses" />
+                <button
+                  onClick={() => {
+                    const conf = window.confirm(
+                      "Are you sure you want to logout?"
+                    );
+                    if (!conf) return;
+                    logout();
+                    navigate("/");
+                  }}
+                  className="flex items-center gap-3 w-full text-left px-4 py-3 rounded-md transition-colors hover:bg-brand-gray-light text-brand-black/70"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>Logout</span>
+                </button>
+              </nav>
+            </aside>
+            <main className="md:col-span-3 bg-white p-8 rounded-lg shadow-sm">
+              {renderContent()}
+            </main>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
