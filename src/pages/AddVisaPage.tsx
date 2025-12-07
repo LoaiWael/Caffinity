@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { CreditCard, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { CreditCard, AlertCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCart } from '../contexts/CartContext';
+
 export default function VisaPaymentForm() {
   const [cardData, setCardData] = useState({
     cardNumber: '',
@@ -12,7 +12,7 @@ export default function VisaPaymentForm() {
     expiryYear: '',
     cvv: ''
   });
-  const {clearCart} = useCart();
+  const { clearCart } = useCart();
   const location = useLocation();
   const orderId = location.state?.orderId;
   const [errors, setErrors] = useState({});
@@ -33,11 +33,9 @@ export default function VisaPaymentForm() {
   };
 
   const handleCardHolderChange = (e) => {
-    const value = e.target.value.toUpperCase();
-    if (/^[A-Z\s]*$/.test(value)) {
-      setCardData({ ...cardData, cardHolder: value });
-      setErrors({ ...errors, cardHolder: '' });
-    }
+    const value = e.target.value;
+    setCardData({ ...cardData, cardHolder: value });
+    setErrors({ ...errors, cardHolder: '' });
   };
 
   const handleCVVChange = (e) => {
@@ -102,13 +100,12 @@ export default function VisaPaymentForm() {
 
     setIsProcessing(true);
 
-    // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       toast.success("Order placed successfully!");
       clearCart();
       navigate('/order-confirmation', {
-          state: { orderId }
+        state: { orderId }
       });
     }, 2000);
   };
@@ -123,201 +120,145 @@ export default function VisaPaymentForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full">
-        <div className="grid md:grid-cols-2">
-          <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-8 text-white flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-8">
-                <Lock className="w-5 h-5" />
-                <span className="text-sm font-medium">Secure Payment</span>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-6 border border-white/20">
-                <div className="flex justify-between items-start mb-8">
-                  <div className="w-12 h-8 bg-yellow-400 rounded"></div>
-                  <CreditCard className="w-10 h-10 text-white/80" />
-                </div>
-                
-                <div className="mb-6">
-                  <p className="text-2xl tracking-wider font-mono">
-                    {formatCardNumber(cardData.cardNumber) || '•••• •••• •••• ••••'}
-                  </p>
-                </div>
-                
-                <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-xs text-white/60 mb-1">Card Holder</p>
-                    <p className="font-medium">{cardData.cardHolder || 'YOUR NAME'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-white/60 mb-1">Expires</p>
-                    <p className="font-medium">
-                      {cardData.expiryMonth || 'MM'}/{cardData.expiryYear ? cardData.expiryYear.slice(-2) : 'YY'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+    <div className="min-h-screen  flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-8">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-brand-black mb-2">Payment Details</h2>
+          <p className="text-brand-gray-dark text-sm">Enter your card information to complete your order</p>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-brand-black mb-2">
+              Card Number
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={formatCardNumber(cardData.cardNumber)}
+                onChange={handleCardNumberChange}
+                placeholder="4111 1111 1111 1111"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-black focus:border-transparent outline-none transition ${
+                  errors.cardNumber ? 'border-red-500' : 'border-brand-gray'
+                }`}
+              />
+              <CreditCard className="absolute right-4 top-3.5 w-5 h-5 text-brand-gray-dark" />
             </div>
-            
-            <div className="space-y-2 text-sm text-white/80">
-              <p className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" /> SSL Encrypted
+            {errors.cardNumber && (
+              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.cardNumber}
               </p>
-              <p className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" /> PCI DSS Compliant
-              </p>
-              <p className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" /> Money Back Guarantee
-              </p>
-            </div>
+            )}
           </div>
 
-          <div className="p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Payment Details</h2>
-            <p className="text-gray-600 mb-6">Complete your order by providing payment details</p>
+          <div>
+            <label className="block text-sm font-medium text-brand-black mb-2">
+              Cardholder Name
+            </label>
+            <input
+              type="text"
+              value={cardData.cardHolder}
+              onChange={handleCardHolderChange}
+              placeholder="John Doe"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-black focus:border-transparent outline-none transition ${
+                errors.cardHolder ? 'border-red-500' : 'border-brand-gray'
+              }`}
+            />
+            {errors.cardHolder && (
+              <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" />
+                {errors.cardHolder}
+              </p>
+            )}
+          </div>
 
-            <div className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Card Number
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={formatCardNumber(cardData.cardNumber)}
-                    onChange={handleCardNumberChange}
-                    placeholder="4111 1111 1111 1111"
-                    className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
-                      errors.cardNumber ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  <CreditCard className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                </div>
-                {errors.cardNumber && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.cardNumber}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cardholder Name
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={cardData.cardHolder}
-                    onChange={handleCardHolderChange}
-                    placeholder="JOHN DOE"
-                    className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
-                      errors.cardHolder ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                </div>
-                {errors.cardHolder && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.cardHolder}
-                  </p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Month
-                  </label>
-                  <select
-                    value={cardData.expiryMonth}
-                    onChange={(e) => {
-                      setCardData({ ...cardData, expiryMonth: e.target.value });
-                      setErrors({ ...errors, expiryMonth: '' });
-                    }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
-                      errors.expiryMonth ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="">MM</option>
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                      <option key={month} value={month.toString().padStart(2, '0')}>
-                        {month.toString().padStart(2, '0')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Year
-                  </label>
-                  <select
-                    value={cardData.expiryYear}
-                    onChange={(e) => {
-                      setCardData({ ...cardData, expiryYear: e.target.value });
-                      setErrors({ ...errors, expiryYear: '' });
-                    }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
-                      errors.expiryYear ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="">YYYY</option>
-                    {generateYearOptions().map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    CVV
-                  </label>
-                  <input
-                    type="text"
-                    value={cardData.cvv}
-                    onChange={handleCVVChange}
-                    placeholder="123"
-                    maxLength="3"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
-                      errors.cvv ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                </div>
-              </div>
-              {(errors.expiryMonth || errors.expiryYear || errors.cvv) && (
-                <p className="text-red-500 text-sm flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.expiryMonth || errors.expiryYear || errors.cvv}
-                </p>
-              )}
-
-              <button
-                onClick={handleSubmit}
-                disabled={isProcessing}
-                className={`w-full py-3 rounded-lg font-semibold text-white transition transform ${
-                  isProcessing
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:scale-[1.02] active:scale-[0.98]'
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-brand-black mb-2">
+                Month
+              </label>
+              <select
+                value={cardData.expiryMonth}
+                onChange={(e) => {
+                  setCardData({ ...cardData, expiryMonth: e.target.value });
+                  setErrors({ ...errors, expiryMonth: '' });
+                }}
+                className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-brand-black focus:border-transparent outline-none transition ${
+                  errors.expiryMonth ? 'border-red-500' : 'border-brand-gray'
                 }`}
               >
-                {isProcessing ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Processing...
-                  </span>
-                ) : (
-                  'Place Order'
-                )}
-              </button>
+                <option value="">MM</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                  <option key={month} value={month.toString().padStart(2, '0')}>
+                    {month.toString().padStart(2, '0')}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <p className="text-xs text-gray-500 text-center mt-4">
-                By confirming your payment, you agree to our Terms of Service
-              </p>
+            <div>
+              <label className="block text-sm font-medium text-brand-black mb-2">
+                Year
+              </label>
+              <select
+                value={cardData.expiryYear}
+                onChange={(e) => {
+                  setCardData({ ...cardData, expiryYear: e.target.value });
+                  setErrors({ ...errors, expiryYear: '' });
+                }}
+                className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-brand-black focus:border-transparent outline-none transition ${
+                  errors.expiryYear ? 'border-red-500' : 'border-brand-gray'
+                }`}
+              >
+                <option value="">YYYY</option>
+                {generateYearOptions().map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-brand-black mb-2">
+                CVV
+              </label>
+              <input
+                type="text"
+                value={cardData.cvv}
+                onChange={handleCVVChange}
+                placeholder="123"
+                maxLength="3"
+                className={`w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-brand-black focus:border-transparent outline-none transition ${
+                  errors.cvv ? 'border-red-500' : 'border-brand-gray'
+                }`}
+              />
             </div>
           </div>
+          {(errors.expiryMonth || errors.expiryYear || errors.cvv) && (
+            <p className="text-red-500 text-sm flex items-center gap-1">
+              <AlertCircle className="w-4 h-4" />
+              {errors.expiryMonth || errors.expiryYear || errors.cvv}
+            </p>
+          )}
+
+          <button
+            onClick={handleSubmit}
+            disabled={isProcessing}
+            className={`w-full py-3 rounded-lg font-semibold text-white transition mt-6 ${
+              isProcessing
+                ? 'bg-brand-gray cursor-not-allowed'
+                : 'bg-brand-black hover:bg-brand-black/90'
+            }`}
+          >
+            {isProcessing ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Processing...
+              </span>
+            ) : (
+              'Place Order'
+            )}
+          </button>
         </div>
       </div>
     </div>
