@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { MapPin, Mail, Phone } from 'lucide-react';
 import drinksData from "../data/drinks_menu.json";
 
-// 💡 إضافة واجهة البيانات (ضرورية لعمل TypeScript/JavaScript بشكل صحيح)
 interface Drink {
  id: number;
  name: string;
@@ -16,10 +15,9 @@ interface Drink {
  rating: number;
 }
 
-const drinks: Drink[] = drinksData as Drink[]; // تأكيد النوع
+const drinks: Drink[] = drinksData as Drink[];
 
 const Footer = () => {
- // 💡 استخدام الفئات المستخرجة مباشرة من البيانات
  const ALL_DRINK_CATEGORIES = Array.from(new Set(drinks.map((d) => d.category)));
  const collections = ALL_DRINK_CATEGORIES; 
   
@@ -36,7 +34,6 @@ return
      <ul className="space-y-2">
       {collections.map(item => (
        <li key={item}>
-        {/* 💡 التعديل: يتم التوجيه إلى /collections مع مُعامِل استعلام مُشفر */}
         <Link 
          to={`/collections?category=${encodeURIComponent(item)}`} 
          className="text-sm text-brand-black/70 hover:text-brand-black transition-colors"
