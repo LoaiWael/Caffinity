@@ -110,7 +110,7 @@ const SignUpPage = () => {
     const success = await signUp({ email, password, firstName, lastName });
 
     if (success) {
-      navigate("/account");
+      navigate("/login");
     } else {
       setEmailError("Email already exists. Please use another email.");
     }

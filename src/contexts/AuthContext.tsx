@@ -1,4 +1,4 @@
-import  {
+import {
   createContext,
   useContext,
   useState,
@@ -95,21 +95,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
 
-    const newUser = { 
+    const newUser = {
       id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      email, 
-      password, 
-      firstName, 
-      lastName 
+      email,
+      password,
+      firstName,
+      lastName
     };
 
     users.push(newUser);
     localStorage.setItem("all_users", JSON.stringify(users));
-
-    // auto-login after signup
-    localStorage.setItem("auth_user", JSON.stringify(newUser));
-    setUser(newUser);
-    setProfile(newUser);
 
     toast.success("Account created successfully!");
     setLoading(false);
@@ -123,19 +118,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
 
     const updatedUser = { ...user, firstName, lastName };
-    
+
     // Update in all_users
     const users = JSON.parse(localStorage.getItem("all_users") || "[]");
-    const updatedUsers = users.map((u: User) => 
+    const updatedUsers = users.map((u: User) =>
       u.id === user.id ? updatedUser : u
     );
     localStorage.setItem("all_users", JSON.stringify(updatedUsers));
-    
+
     // Update current session
     localStorage.setItem("auth_user", JSON.stringify(updatedUser));
     setUser(updatedUser);
     setProfile(updatedUser);
-    
+
     toast.success("Profile updated successfully!");
   };
 
