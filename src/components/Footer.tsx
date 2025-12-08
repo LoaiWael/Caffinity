@@ -24,8 +24,7 @@ const Footer = () => {
  const learn = ["About us", "About our teas", "Tea academy"];
  const customerService = ["Ordering and payment", "Delivery", "Privacy and policy", "Terms & Conditions"];
 
-return 
- <footer className="bg-brand-gray-light font-body">
+return (<footer className="bg-brand-gray-light font-body">
   <div className="container mx-auto px-6 py-12">
    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
     
@@ -85,8 +84,7 @@ return
    <p>&copy; {new Date().getFullYear()} Caffinity. All Rights Reserved.</p>
   </div>
    </div>
-  </footer>
- ;
+  </footer>);
 };
 
 export default Footer;

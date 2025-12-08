@@ -19,13 +19,13 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   profile: User | null;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
+  login: (credentials: { email: string; password: string }) => Promise<boolean>;
   signUp: (credentials: {
     email: string;
     password: string;
     firstName: string;
     lastName: string;
-  }) => Promise<void>;
+  }) => Promise<boolean>;
   logout: () => void;
   updateProfile: (updates: { firstName: string; lastName: string }) => void;
   loading: boolean;
@@ -68,9 +68,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     if (!found) {
-      toast.error("Invalid email or password");
       setLoading(false);
-      return;
+      return false;
     }
 
     localStorage.setItem("auth_user", JSON.stringify(found));
@@ -79,6 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     toast.success("Logged in successfully!");
     setLoading(false);
+    return true;
   };
 
   // ---------------------------------------------
@@ -91,9 +91,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // prevent duplicate accounts
     if (users.find((u: any) => u.email === email)) {
-      toast.error("Email already exists");
       setLoading(false);
-      return;
+      return false;
     }
 
     const newUser = { 
@@ -114,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     toast.success("Account created successfully!");
     setLoading(false);
+    return true;
   };
 
   // ---------------------------------------------

@@ -9,21 +9,67 @@ const LoginPage = () => {
   const { login, loading } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError("Email is required");
+      return false;
+    }
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return false;
+    }
+    setEmailError(null);
+    return true;
+  };
+
+  const validatePassword = (password: string): boolean => {
+    if (!password) {
+      setPasswordError("Password is required");
+      return false;
+    }
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      return false;
+    }
+    setPasswordError(null);
+    return true;
+  };
+
+  const handleEmailBlur = () => {
+    validateEmail(email);
+  };
+
+  const handlePasswordBlur = () => {
+    validatePassword(password);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    await login({ email, password });
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
 
-    const savedUser = localStorage.getItem("auth_user");
-    if (savedUser) {
-      navigate("/account");
+    if (!isEmailValid || !isPasswordValid) {
+      return;
     }
+
+    const result = await login({ email, password });
+
+    if (!result) {
+      setError("Invalid email or password. Please try again.");
+      return;
+    }
+
+    navigate("/account");
   };
 
   return (
@@ -41,10 +87,19 @@ const LoginPage = () => {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailError) validateEmail(e.target.value);
+                  }}
+                  onBlur={handleEmailBlur}
                   required
-                  className="w-full px-4 py-3 border border-brand-gray rounded-md"
+                  className={`w-full px-4 py-3 border rounded-md ${
+                    emailError ? "border-red-500" : "border-brand-gray"
+                  }`}
                 />
+                {emailError && (
+                  <p className="text-red-500 text-sm mt-1">{emailError}</p>
+                )}
               </div>
               <div>
                 <label htmlFor="password">Password</label>
@@ -52,10 +107,19 @@ const LoginPage = () => {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) validatePassword(e.target.value);
+                  }}
+                  onBlur={handlePasswordBlur}
                   required
-                  className="w-full px-4 py-3 border border-brand-gray rounded-md"
+                  className={`w-full px-4 py-3 border rounded-md ${
+                    passwordError ? "border-red-500" : "border-brand-gray"
+                  }`}
                 />
+                {passwordError && (
+                  <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+                )}
               </div>
               {error && <p className="text-brand-red text-sm">{error}</p>}
               <Button type="submit" className="w-full" disabled={loading}>

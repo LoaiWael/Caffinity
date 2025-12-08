@@ -12,30 +12,107 @@ const SignUpPage = () => {
   const { signUp, loading } = useAuth();
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [firstNameError, setFirstNameError] = useState<string | null>(null);
+  const [lastNameError, setLastNameError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError("Email is required");
+      return false;
+    }
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return false;
+    }
+    setEmailError(null);
+    return true;
+  };
+
+  const validatePassword = (password: string): boolean => {
+    if (!password) {
+      setPasswordError("Password is required");
+      return false;
+    }
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      return false;
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+      setPasswordError("Password must contain at least one lowercase letter");
+      return false;
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      setPasswordError("Password must contain at least one uppercase letter");
+      return false;
+    }
+    if (!/(?=.*\d)/.test(password)) {
+      setPasswordError("Password must contain at least one number");
+      return false;
+    }
+    setPasswordError(null);
+    return true;
+  };
+
+  const validateFirstName = (name: string): boolean => {
+    if (!name || name.trim().length === 0) {
+      setFirstNameError("First name is required");
+      return false;
+    }
+    if (name.trim().length < 2) {
+      setFirstNameError("First name must be at least 2 characters");
+      return false;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(name)) {
+      setFirstNameError("First name can only contain letters");
+      return false;
+    }
+    setFirstNameError(null);
+    return true;
+  };
+
+  const validateLastName = (name: string): boolean => {
+    if (!name || name.trim().length === 0) {
+      setLastNameError("Last name is required");
+      return false;
+    }
+    if (name.trim().length < 2) {
+      setLastNameError("Last name must be at least 2 characters");
+      return false;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(name)) {
+      setLastNameError("Last name can only contain letters");
+      return false;
+    }
+    setLastNameError(null);
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSuccess(false);
 
-    const success: any = await signUp({ email, password, firstName, lastName });
+    const isFirstNameValid = validateFirstName(firstName);
+    const isLastNameValid = validateLastName(lastName);
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+
+    if (!isFirstNameValid || !isLastNameValid || !isEmailValid || !isPasswordValid) {
+      return;
+    }
+
+    const success = await signUp({ email, password, firstName, lastName });
 
     if (success) {
-      setIsSuccess(true);
-      setEmail("");
-      setPassword("");
-      setFirstName("");
-      setLastName("");
       navigate("/account");
     } else {
-      setEmail("");
-      setPassword("");
-      setFirstName("");
-      setLastName("");
-      toast.error("Email already exists. Please use another email.");
+      setEmailError("Email already exists. Please use another email.");
     }
   };
 
@@ -64,10 +141,19 @@ const SignUpPage = () => {
                     id="firstName"
                     type="text"
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    onChange={(e) => {
+                      setFirstName(e.target.value);
+                      if (firstNameError) validateFirstName(e.target.value);
+                    }}
+                    onBlur={() => validateFirstName(firstName)}
                     required
-                    className="w-full px-4 py-3 border rounded-md"
+                    className={`w-full px-4 py-3 border rounded-md ${
+                      firstNameError ? "border-red-500" : "border-gray-300"
+                    }`}
                   />
+                  {firstNameError && (
+                    <p className="text-red-500 text-sm mt-1">{firstNameError}</p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="lastName">Last Name</label>
@@ -75,10 +161,19 @@ const SignUpPage = () => {
                     id="lastName"
                     type="text"
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => {
+                      setLastName(e.target.value);
+                      if (lastNameError) validateLastName(e.target.value);
+                    }}
+                    onBlur={() => validateLastName(lastName)}
                     required
-                    className="w-full px-4 py-3 border rounded-md"
+                    className={`w-full px-4 py-3 border rounded-md ${
+                      lastNameError ? "border-red-500" : "border-gray-300"
+                    }`}
                   />
+                  {lastNameError && (
+                    <p className="text-red-500 text-sm mt-1">{lastNameError}</p>
+                  )}
                 </div>
               </div>
 
@@ -88,10 +183,19 @@ const SignUpPage = () => {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailError) validateEmail(e.target.value);
+                  }}
+                  onBlur={() => validateEmail(email)}
                   required
-                  className="w-full px-4 py-3 border rounded-md"
+                  className={`w-full px-4 py-3 border rounded-md ${
+                    emailError ? "border-red-500" : "border-gray-300"
+                  }`}
                 />
+                {emailError && (
+                  <p className="text-red-500 text-sm mt-1">{emailError}</p>
+                )}
               </div>
 
               <div>
@@ -100,10 +204,22 @@ const SignUpPage = () => {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) validatePassword(e.target.value);
+                  }}
+                  onBlur={() => validatePassword(password)}
                   required
-                  className="w-full px-4 py-3 border rounded-md"
+                  className={`w-full px-4 py-3 border rounded-md ${
+                    passwordError ? "border-red-500" : "border-gray-300"
+                  }`}
                 />
+                {passwordError && (
+                  <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+                )}
+                <p className="text-gray-500 text-xs mt-1">
+                  Must be at least 6 characters with uppercase, lowercase, and number
+                </p>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
