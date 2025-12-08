@@ -169,10 +169,10 @@ export default function VisaPaymentForm() {
     <>
       <title>Caffinity - Add Visa</title>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full">
+      <div className="min-h-screen bg-brand-gray-light flex items-center justify-center p-4">
+        <div className="bg-brand-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full">
           <div className="grid md:grid-cols-2">
-            <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-8 text-white flex flex-col justify-between">
+            <div className="bg-gradient-to-br from-brand-gray to-brand-gray-dark p-8 text-white flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-8">
                   <Lock className="w-5 h-5" />
@@ -340,7 +340,7 @@ export default function VisaPaymentForm() {
                   disabled={isProcessing}
                   className={`w-full py-3 rounded-lg font-semibold text-white transition transform ${isProcessing
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:scale-[1.02] active:scale-[0.98]'
+                    : 'bg-brand-black hover:bg-brand-black/90 hover:scale-[1.02] active:scale-[0.98]'
                     }`}
                 >
                   {isProcessing ? (
