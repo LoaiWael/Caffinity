@@ -2,72 +2,67 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { ChevronDown, Plus, Minus } from "lucide-react";
-import drinksData from "../data/drinks_menu.json";
-
-interface Drink {
- id: number;
- name: string;
- description: string;
- category: string;
- price: number;
- currency: string;
- image: string;
- available: boolean;
- rating: number;
-}
-
-const drinks: Drink[] = drinksData;
+import { productService } from "../services/api";
+import { Product } from "../types";
+import Loader from "../components/ui/Loader";
 
 // Filter components
 const FilterSection = ({
- title,
- children,
- defaultOpen = false,
+  title,
+  children,
+  defaultOpen = false,
 }: {
- title: string;
- children: React.ReactNode;
- defaultOpen?: boolean;
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
 }) => {
- const [isOpen, setIsOpen] = useState(defaultOpen);
- return (
-  <div className="border-b border-brand-gray-dark/50 py-4">
-   <button
-    onClick={() => setIsOpen(!isOpen)}
-    className="w-full flex justify-between items-center"
-   >
-   <h3 className="font-semibold uppercase tracking-wider">{title}</h3>
-   {isOpen ? <Minus size={20} /> : <Plus size={20} />}
-   </button>
-   {isOpen && <div className="mt-4 space-y-2">{children}</div>}
-  </div>
- );
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <div className="border-b border-brand-gray-dark/50 py-4">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center"
+      >
+        <h3 className="font-semibold uppercase tracking-wider">{title}</h3>
+        {isOpen ? <Minus size={20} /> : <Plus size={20} />}
+      </button>
+      {isOpen && <div className="mt-4 space-y-2">{children}</div>}
+    </div>
+  );
 };
 
 const FilterCheckbox = ({
- label,
- isChecked,
- onChange,
+  label,
+  isChecked,
+  onChange,
 }: {
- label: string;
- isChecked: boolean;
- onChange: (label: string) => void;
+  label: string;
+  isChecked: boolean;
+  onChange: (label: string) => void;
 }) => (
- <label className="flex items-center gap-3 cursor-pointer capitalize">
-  <input
-   type="checkbox"
-   className="h-4 w-4 rounded border-brand-black text-brand-black focus:ring-brand-black"
-   checked={isChecked}
-   onChange={() => onChange(label)}
-  />
-  <span className="text-sm">{label}</span>
- </label>
+  <label className="flex items-center gap-3 cursor-pointer capitalize">
+    <input
+      type="checkbox"
+      className="h-4 w-4 rounded border-brand-black text-brand-black focus:ring-brand-black"
+      checked={isChecked}
+      onChange={() => onChange(label)}
+    />
+    <span className="text-sm">{label}</span>
+  </label>
 );
 
 const CollectionsPage = () => {
   const location = useLocation();
+  const [drinks, setDrinks] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    productService
+      .getProducts()
+      .then((res) => setDrinks(res.data))
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
   const getInitialCategory = () => {
@@ -130,12 +125,12 @@ const CollectionsPage = () => {
 
     // Filter by availability
     if (showAvailableOnly) {
-      filtered = filtered.filter((p) => p.available);
+      filtered = filtered.filter((p) => p.isAvailable);
     }
 
     // Filter by minimum rating
     if (minRating > 0) {
-      filtered = filtered.filter((p) => p.rating >= minRating);
+      filtered = filtered.filter((p) => (p.ratingsAverage || 0) >= minRating);
     }
 
     const sorted = [...filtered];
@@ -157,7 +152,7 @@ const CollectionsPage = () => {
     }
 
     return sorted;
-  }, [selectedCategories, sortOption, priceRange, showAvailableOnly, minRating]);
+  }, [drinks, selectedCategories, sortOption, priceRange, showAvailableOnly, minRating]);
 
   return (
     <>
@@ -316,7 +311,9 @@ const CollectionsPage = () => {
                 </div>
               </div>
 
-              {displayedProducts.length === 0 ? (
+              {loading ? (
+                <Loader />
+              ) : displayedProducts.length === 0 ? (
                 <div className="text-center py-20 col-span-full">
                   <p className="text-lg text-brand-black/70">
                     No drinks match your current selection.
@@ -324,8 +321,8 @@ const CollectionsPage = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-12">
-                  {displayedProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                  {displayedProducts.map((product, index) => (
+                    <ProductCard key={product._id} product={product} index={index} />
                   ))}
                 </div>
               )}

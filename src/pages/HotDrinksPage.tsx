@@ -1,15 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
-import drinksData from "../data/drinks_menu.json";
+import { productService } from "../services/api";
+import { Product } from "../types";
+import Loader from "../components/ui/Loader";
 
 const HotDrinksPage = () => {
+  const [hotDrinksProducts, setHotDrinksProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    productService
+      .getProducts({ category: "Hot Drinks" })
+      .then((res) => {
+        setHotDrinksProducts(res.data);
+      })
+      .catch((err) => console.error("Error fetching hot drinks:", err))
+      .finally(() => setLoading(false));
   }, []);
-
-  const hotDrinksProducts = drinksData.filter(
-    (drink) => drink.category === "Hot Drinks"
-  );
 
   return (
     <>
@@ -27,10 +35,12 @@ const HotDrinksPage = () => {
         </section>
 
         <main className="container mx-auto px-6 py-16">
-          {hotDrinksProducts.length > 0 ? (
+          {loading ? (
+            <Loader />
+          ) : hotDrinksProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
-              {hotDrinksProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {hotDrinksProducts.map((product, index) => (
+                <ProductCard key={product._id} product={product} index={index} />
               ))}
             </div>
           ) : (

@@ -4,22 +4,49 @@ import { Button } from "../components/ui/Button";
 import { Plus, Minus, ShoppingBag } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { useCart } from "../contexts/CartContext";
-import drinksData from "../data/drinks_menu.json";
-import type { Drink } from "../types";
-
-const drinks: Drink[] = drinksData;
+import { productService } from "../services/api";
+import { Product } from "../types";
+import Loader from "../components/ui/Loader";
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [product, setProduct] = useState<Drink | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    const found = drinks.find((p) => p.id === Number(id));
-    setProduct(found || null);
+    if (id) {
+      setLoading(true);
+      productService
+        .getProductById(id)
+        .then((res) => {
+          const fetchedProduct = res.data;
+          setProduct(fetchedProduct);
+          productService
+            .getProducts({ category: fetchedProduct.category as string })
+            .then((catRes) => {
+              setRelatedProducts(
+                catRes.data.filter((p: Product) => p._id !== id).slice(0, 4)
+              );
+            })
+            .finally(() => setLoading(false));
+        })
+        .catch((err) => {
+          console.error(err);
+          setLoading(false);
+        });
+    }
   }, [id]);
+
+  if (loading)
+    return (
+      <div className="container mx-auto py-40">
+        <Loader />
+      </div>
+    );
 
   if (!product)
     return (
@@ -28,16 +55,14 @@ const ProductDetailPage: React.FC = () => {
       </div>
     );
 
-  const relatedProducts = drinks
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
+
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
   };
 
   const ratingCheck = (bg = false): string => {
-    const rating = product.rating;
+    const rating = product.ratingsAverage || 0;
 
     if (rating >= 4) {
       return bg ? "bg-brand-green/10" : "text-brand-green";
@@ -108,21 +133,21 @@ const ProductDetailPage: React.FC = () => {
                   true
                 )}`}
               >
-                <small className="font-bold">{product.rating}</small>
+                <small className="font-bold">{product.ratingsAverage}</small>
                 <small className={ratingCheck()}>★</small>
               </div></div>
           </div>
         </div>
-        
-        
+
+
 
         {relatedProducts.length > 0 && (
           <section className="py-20 border-t border-brand-gray">
             <div className="container mx-auto px-6 text-center">
               <h2 className="font-heading text-4xl mb-12">You may also like</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
-                {relatedProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                {relatedProducts.map((p, index) => (
+                  <ProductCard key={p._id} product={p} index={index} />
                 ))}
               </div>
             </div>

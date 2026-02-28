@@ -1,18 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useCart } from "../contexts/CartContext";
-import type { Drink } from "../types";
+import type { Product } from "../types";
 
 interface ProductCardProps {
-  product: Drink;
+  product: Product;
+  index?: number;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
   if (!product) return null;
   const { addToCart } = useCart();
 
   const ratingCheck = (bg = false): string => {
-    const rating = product.rating;
+    const rating = product.ratingsAverage || 0;
 
     if (rating >= 4) {
       return bg ? "bg-brand-green/10" : "text-brand-green";
@@ -24,10 +26,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="transition-all group border-2 border-brand-gray/60 rounded-2xl shadow-brand-black/5 shadow-md relative lg:hover:scale-[1.0125] lg:hover:shadow-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+      className="transition-all group border-2 border-brand-gray/60 rounded-2xl shadow-brand-black/5 shadow-md relative lg:hover:scale-[1.0125] lg:hover:shadow-lg"
+    >
       <Link
-        to={`/products/${product.id}`}
+        to={`/products/${product._id || product.slug}`}
         className="flex flex-col items-start p-3"
+        viewTransition
       >
         <div className="bg-brand-gray-light w-full aspect-square overflow-hidden mb-4 rounded-lg">
           <img
@@ -53,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             true
           )}`}
         >
-          <small className="font-bold">{product.rating}</small>
+          <small className="font-bold">{product.ratingsAverage}</small>
           <small className={ratingCheck()}>★</small>
         </div>
 
@@ -69,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       >
         <img className="w-7 aspect-square" src={'/assets/svg/add-to-shopping-bag.svg'} alt="Add to Bag" />
       </button>
-    </div>
+    </motion.div>
   );
 };
 

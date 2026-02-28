@@ -1,15 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
-import drinksData from "../data/drinks_menu.json"; 
+import { productService } from "../services/api";
+import { Product } from "../types";
+import Loader from "../components/ui/Loader";
 
 const ColdDrinksPage = () => {
+  const [coldDrinksProducts, setColdDrinksProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
 
-  const coldDrinksProducts = drinksData.filter(
-    (drink) => drink.category !== "Hot Drinks"
-  );
+    productService
+      .getProducts()
+      .then((res) => {
+        setColdDrinksProducts(
+          res.data.filter((drink: Product) => drink.category !== "Hot Drinks")
+        );
+      })
+      .catch((err) => console.error("Error fetching cold drinks:", err))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <>
@@ -27,10 +38,12 @@ const ColdDrinksPage = () => {
         </section>
 
         <main className="container mx-auto px-6 py-16">
-          {coldDrinksProducts.length > 0 ? (
+          {loading ? (
+            <Loader />
+          ) : coldDrinksProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
-              {coldDrinksProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {coldDrinksProducts.map((product, index) => (
+                <ProductCard key={product._id} product={product} index={index} />
               ))}
             </div>
           ) : (

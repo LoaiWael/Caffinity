@@ -47,10 +47,11 @@ const SearchOverlay: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                   {filteredDrinks.map((drink) => (
                     <Link
-                      to={`/products/${drink.id}`}
-                      key={drink.id}
+                      to={`/products/${drink._id || drink.slug}`}
+                      key={drink._id}
                       onClick={() => setIsSearchOpen(false)}
                       className="group"
+                      viewTransition
                     >
                       <div className="flex flex-col items-start text-left">
                         <div className="bg-brand-gray-light w-full aspect-square overflow-hidden mb-4">

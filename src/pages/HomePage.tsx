@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
-import { Coffee, Award, Truck, Tag, Star,  } from "lucide-react";
+import { Coffee, Award, Truck, Tag, Star, } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import drinksData from "../data/drinks_menu.json";
+import { useState } from "react";
+import { productService } from "../services/api";
+import { Product } from "../types";
+import Loader from "../components/ui/Loader";
 
 const features = [
   { icon: Coffee, text: "WIDE SELECTION" },
@@ -64,7 +67,22 @@ const HomePage = () => {
   }, []);
 
 
-  const drinks = drinksData;
+  const [drinks, setDrinks] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    productService
+      .getProducts()
+      .then((res) => {
+        setDrinks(res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching products:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <>
@@ -149,9 +167,13 @@ const HomePage = () => {
               <Star className="h-8 w-8 text-brand-black" fill="currentColor" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
-              {drinks.slice(0, 10).map((drink) => (
-                <ProductCard product={drink} key={drink.id} />
-              ))}
+              {loading ? (
+                <Loader />
+              ) : (
+                drinks.slice(0, 10).map((drink, index) => (
+                  <ProductCard product={drink} key={drink._id} index={index} />
+                ))
+              )}
             </div>
             <div className="text-center mt-12">
               <Button asChild to="/collections">

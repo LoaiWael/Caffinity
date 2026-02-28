@@ -1,19 +1,21 @@
 export type Category = "Hot Drinks" | "Cold Drinks" | "Fresh Juices" | "Smoothies" | "Milkshakes" | "Specialty Drinks" | "Energy Drinks";
 
-export interface Drink {
-  id: number;
+export interface Product {
+  _id: string;
   name: string;
-  description: string | null;
+  description: string;
   price: number;
   currency: string;
-  image: string | null;
-  created_at?: string;
+  ratingsAverage: number;
+  ratingsQuantity: number;
   category: Category | string;
-  rating: number;
-  available: boolean;
+  image: string;
+  isAvailable: boolean;
+  slug: string;
+  __v: number;
 }
 
-export type CartItem = Drink & {
+export type CartItem = Product & {
   quantity: number;
 };
 
