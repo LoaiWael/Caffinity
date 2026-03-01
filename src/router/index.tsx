@@ -12,6 +12,7 @@ import CheckoutPaymentPage from "../pages/CheckoutPaymentPage";
 import LoginPage from "../pages/LoginPage";
 import OrderConfirmationPage from "../pages/OrderConfirmationPage";
 import SignUpPage from "../pages/SignUpPage";
+import ForgetPasswordPage from "../pages/ForgetPasswordPage";
 import ProtectedRoute from "./ProtectedRoute";
 import RouteErrorPage from "../pages/RouteErrorPage";
 import HotDrinksPage from "../pages/HotDrinksPage";
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
       { path: "contact", element: <ContactPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignUpPage /> },
+      { path: "forget-password", element: <ForgetPasswordPage /> },
       {
         element: <ProtectedRoute />,
         children: [
