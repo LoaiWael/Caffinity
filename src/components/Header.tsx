@@ -111,7 +111,7 @@ const Header = () => {
 
       {isMenuOpen && (
         <div className="lg:hidden absolute top-16 left-0 w-full">
-          <nav className="flex flex-col p-4 space-y-2 container mx-auto bg-brand-gray/80 backdrop-blur-lg shadow-lg rounded-lg">
+          <nav className="flex flex-col p-4 space-y-2 container mx-auto bg-brand-gray/95 backdrop-blur-lg shadow-lg rounded-lg">
             {navLinks.map((link) => (
               <NavLink
                 key={link.name}
