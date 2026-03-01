@@ -3,8 +3,8 @@ import { CreditCard, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
 import type { Order, OrderItem } from '../types';
+import { useUser } from '../contexts/UserContext';
 
 export default function VisaPaymentForm() {
   const [cardData, setCardData] = useState({
@@ -15,7 +15,7 @@ export default function VisaPaymentForm() {
     cvv: ''
   });
   const { clearCart, cartItems, totalPrice } = useCart();
-  const { user } = useAuth();
+  const { user } = useUser();
   const location = useLocation();
   const orderId = location.state?.orderId;
   const shippingAddress = location.state?.shippingAddress;
@@ -124,7 +124,7 @@ export default function VisaPaymentForm() {
       if (user) {
         const orderItems: OrderItem[] = cartItems.map((item, index) => ({
           id: index + 1,
-          productId: item.id,
+          productId: item._id,
           name: item.name,
           quantity: item.quantity,
           price: item.price,
@@ -133,7 +133,7 @@ export default function VisaPaymentForm() {
 
         const newOrder: Order = {
           id: orderId,
-          userId: user.id,
+          userId: user._id,
           created_at: new Date().toISOString(),
           total_amount: totalPrice,
           status: 'processing',

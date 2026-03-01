@@ -3,12 +3,12 @@ import { Link, NavLink } from "react-router-dom";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { useSearch } from "../contexts/SearchContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useUser } from "../contexts/UserContext";
 
 const Header = () => {
   const { cartCount, setIsCartOpen } = useCart();
   const { setIsSearchOpen } = useSearch();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useUser();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const navLinks = [
@@ -20,8 +20,8 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 site-header">
-      <div className="container mx-auto">
-        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-brand-white/85 backdrop-blur-md rounded-b-xl shadow-brand-black/15 shadow-xl">
+      <div className="container mx-auto w-[90%]">
+        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-brand-white/95 backdrop-blur-lg rounded-b-xl shadow-brand-black/15 shadow-xl">
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center gap-2" viewTransition>
               <img
@@ -90,7 +90,7 @@ const Header = () => {
           </div>
         </div>
 
-        <nav className="hidden lg:flex items-center space-x-2 bg-brand-gray/80 backdrop-blur-lg rounded-b-lg mx-3 px-3">
+        <nav className="hidden lg:flex items-center space-x-2 bg-brand-gray/90 rounded-b-lg mx-3 px-3">
           {navLinks.map((link) => (
             <NavLink
               key={link.name}

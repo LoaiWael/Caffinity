@@ -28,21 +28,21 @@ const CartPage = () => {
             <div className="lg:col-span-2 space-y-6">
               {cartItems.length > 0 ? (
                 cartItems.map(item => (
-                  <div key={item.id} className="flex flex-col sm:flex-row gap-6 p-4 border border-brand-gray rounded-xl shadow-md shadow-brand-gray-dark/20">
+                  <div key={item._id} className="flex flex-col sm:flex-row gap-6 p-4 border border-brand-gray rounded-xl shadow-md shadow-brand-gray-dark/20">
                     <img src={item.image!} alt={item.name} className="w-full sm:w-32 h-32 object-cover bg-brand-gray-light rounded-md" />
                     <div className="flex-grow flex flex-col justify-between">
                       <h3 className="font-medium text-xl leading-tight">{item.name}</h3>
                       <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center border border-brand-gray rounded">
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-2"><Minus size={16} /></button>
+                          <button onClick={() => updateQuantity(item._id, item.quantity - 1)} className="p-2"><Minus size={16} /></button>
                           <span className="px-4 text-sm">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-2"><Plus size={16} /></button>
+                          <button onClick={() => updateQuantity(item._id, item.quantity + 1)} className="p-2"><Plus size={16} /></button>
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-col justify-between items-end">
                       <p className="font-semibold text-lg sm:text-right">€{(item.price * item.quantity).toFixed(2)}</p>
-                      <button onClick={() => removeFromCart(item.id)} className="text-xs uppercase tracking-wider text-brand-red bg-brand-red/15 hover:opacity-60 transition rounded-xl p-2 shadow-sm shadow-brand-gray-dark/20"><Trash2 size={20} /></button>
+                      <button onClick={() => removeFromCart(item._id)} className="text-xs uppercase tracking-wider text-brand-red bg-brand-red/15 hover:opacity-60 transition rounded-xl p-2 shadow-sm shadow-brand-gray-dark/20"><Trash2 size={20} /></button>
                     </div>
                   </div>
                 ))

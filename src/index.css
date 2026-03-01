@@ -16,7 +16,7 @@
 
 ::view-transition-group(main-page) {
   animation-duration: 350ms;
-  animation-timing-function: ease-in-out;
+  animation-timing-function: ease;
 }
 
 ::view-transition-old(main-page) {

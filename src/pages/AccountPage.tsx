@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, ShoppingBag, MapPin, LogOut, Plus, Edit2, Trash2, Check, X } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { useUser } from "../contexts/UserContext";
 import { Button } from "../components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import type { Order, Address } from "../types";
@@ -10,7 +10,7 @@ type Tab = "dashboard" | "orders" | "profile" | "addresses";
 
 const AccountPage = () => {
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
-  const { profile, logout, loading: authLoading } = useAuth();
+  const { user, logout, loading: authLoading } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const AccountPage = () => {
 
   if (authLoading)
     return <div className="text-center py-20">Loading account...</div>;
-  if (!profile) {
+  if (!user) {
     navigate("/login");
     return null;
   }
@@ -27,13 +27,13 @@ const AccountPage = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <DashboardTab profile={profile} />;
+        return <DashboardTab profile={user} />;
       case "orders":
-        return <OrdersTab userId={profile.id} />;
+        return <OrdersTab userId={user._id} />;
       case "profile":
-        return <ProfileTab profile={profile} />;
+        return <ProfileTab profile={user} />;
       case "addresses":
-        return <AddressesTab userId={profile.id} />;
+        return <AddressesTab userId={user._id} />;
       default:
         return null;
     }
@@ -62,7 +62,7 @@ const AccountPage = () => {
 
   return (
     <>
-      <title>Caffinity - {profile.firstName} Account</title>
+      <title>Caffinity - {user.firstName} Account</title>
 
       <div className="bg-brand-gray-light min-h-[calc(100vh-12rem)]">
         <div className="container mx-auto px-6 py-12">
@@ -80,8 +80,7 @@ const AccountPage = () => {
                       "Are you sure you want to logout?"
                     );
                     if (!conf) return;
-                    logout();
-                    navigate("/");
+                    logout().then(() => navigate("/"))
                   }}
                   className="flex items-center gap-3 w-full text-left px-4 py-3 rounded-md transition-colors hover:bg-brand-gray-light text-brand-black/70"
                 >
@@ -121,7 +120,7 @@ const OrdersTab = ({ userId }: { userId: string }) => {
     const allOrders = JSON.parse(localStorage.getItem("all_orders") || "[]");
     const userOrders = allOrders.filter((order: Order) => order.userId === userId);
     // Sort by date, newest first
-    userOrders.sort((a: Order, b: Order) => 
+    userOrders.sort((a: Order, b: Order) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
     setOrders(userOrders);
@@ -206,7 +205,7 @@ const OrdersTab = ({ userId }: { userId: string }) => {
 };
 
 const ProfileTab = ({ profile }: { profile: any }) => {
-  const { updateProfile } = useAuth();
+  // const { user } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: profile.firstName || "",
@@ -218,7 +217,8 @@ const ProfileTab = ({ profile }: { profile: any }) => {
       toast.error("First name and last name are required");
       return;
     }
-    updateProfile(formData);
+    // updateProfile(formData);  // Temporarily stubbed until update user endpoint is available
+    toast.success("Profile updated locally (API not yet integrated)");
     setIsEditing(false);
   };
 
@@ -251,9 +251,8 @@ const ProfileTab = ({ profile }: { profile: any }) => {
               type="text"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${
-                isEditing ? "bg-white" : "bg-brand-gray-light"
-              }`}
+              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${isEditing ? "bg-white" : "bg-brand-gray-light"
+                }`}
               readOnly={!isEditing}
             />
           </div>
@@ -265,9 +264,8 @@ const ProfileTab = ({ profile }: { profile: any }) => {
               type="text"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${
-                isEditing ? "bg-white" : "bg-brand-gray-light"
-              }`}
+              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${isEditing ? "bg-white" : "bg-brand-gray-light"
+                }`}
               readOnly={!isEditing}
             />
           </div>
@@ -350,7 +348,7 @@ const AddressesTab = ({ userId }: { userId: string }) => {
         id: `addr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         userId,
       };
-      
+
       // If this is the first address or set as default, make it default
       if (addresses.length === 0 || formData.isDefault) {
         const updatedAddresses = allAddresses.map((addr: Address) =>
@@ -563,9 +561,8 @@ const AddressesTab = ({ userId }: { userId: string }) => {
           addresses.map((address) => (
             <div
               key={address.id}
-              className={`border rounded-lg p-4 ${
-                address.isDefault ? "border-brand-black bg-brand-gray-light/30" : "border-brand-gray"
-              }`}
+              className={`border rounded-lg p-4 ${address.isDefault ? "border-brand-black bg-brand-gray-light/30" : "border-brand-gray"
+                }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-grow">
