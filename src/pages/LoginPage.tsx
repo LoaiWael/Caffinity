@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useUser } from "../contexts/UserContext";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loading } = useAuth();
+  const { login } = useUser();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -62,14 +63,15 @@ const LoginPage = () => {
       return;
     }
 
-    const result = await login({ email, password });
-
-    if (!result) {
-      setError("Invalid email or password. Please try again.");
-      return;
+    setLoading(true);
+    try {
+      await login({ email, password });
+      navigate("/account", { viewTransition: true });
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || "An error occurred during login.");
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/account");
   };
 
   return (
@@ -93,9 +95,8 @@ const LoginPage = () => {
                   }}
                   onBlur={handleEmailBlur}
                   required
-                  className={`w-full px-4 py-3 border rounded-md ${
-                    emailError ? "border-red-500" : "border-brand-gray"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-md ${emailError ? "border-red-500" : "border-brand-gray"
+                    }`}
                 />
                 {emailError && (
                   <p className="text-red-500 text-sm mt-1">{emailError}</p>
@@ -113,9 +114,8 @@ const LoginPage = () => {
                   }}
                   onBlur={handlePasswordBlur}
                   required
-                  className={`w-full px-4 py-3 border rounded-md ${
-                    passwordError ? "border-red-500" : "border-brand-gray"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-md ${passwordError ? "border-red-500" : "border-brand-gray"
+                    }`}
                 />
                 {passwordError && (
                   <p className="text-red-500 text-sm mt-1">{passwordError}</p>
@@ -126,12 +126,19 @@ const LoginPage = () => {
                 {loading ? "Logging in..." : "Login"}
               </Button>
             </form>
-            <p className="text-center text-sm text-brand-black/70 mt-4">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-brand-yellow underline">
-                Sign up
-              </Link>
-            </p>
+            <div className="flex flex-col space-y-4 mt-6">
+              <p className="text-center text-sm text-brand-black/70">
+                Don't have an account?{" "}
+                <Link to="/signup" className="text-brand-yellow underline" viewTransition>
+                  Sign up
+                </Link>
+              </p>
+              <div className="text-center">
+                <Link to="/forget-password" className="text-sm text-brand-black/70 hover:text-brand-yellow underline transition-colors" viewTransition>
+                  Forget your password?
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

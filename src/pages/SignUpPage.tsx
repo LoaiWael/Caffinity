@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import toast from "react-hot-toast";
+import { authService } from "../services/api";
 
 const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const { signUp, loading } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   const [firstNameError, setFirstNameError] = useState<string | null>(null);
   const [lastNameError, setLastNameError] = useState<string | null>(null);
 
@@ -60,6 +62,19 @@ const SignUpPage = () => {
     return true;
   };
 
+  const validateConfirmPassword = (confirmPwd: string): boolean => {
+    if (!confirmPwd) {
+      setConfirmPasswordError("Please confirm your password");
+      return false;
+    }
+    if (confirmPwd !== password) {
+      setConfirmPasswordError("Passwords do not match");
+      return false;
+    }
+    setConfirmPasswordError(null);
+    return true;
+  };
+
   const validateFirstName = (name: string): boolean => {
     if (!name || name.trim().length === 0) {
       setFirstNameError("First name is required");
@@ -102,17 +117,33 @@ const SignUpPage = () => {
     const isLastNameValid = validateLastName(lastName);
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
+    const isConfirmPasswordValid = validateConfirmPassword(confirmPassword);
 
-    if (!isFirstNameValid || !isLastNameValid || !isEmailValid || !isPasswordValid) {
+    if (!isFirstNameValid || !isLastNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
       return;
     }
 
-    const success = await signUp({ email, password, firstName, lastName });
+    setLoading(true);
+    try {
+      const response = await authService.signup({
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
+      });
 
-    if (success) {
-      navigate("/login");
-    } else {
-      setEmailError("Email already exists. Please use another email.");
+      if (response.status === 201) {
+        setIsSuccess(true);
+        toast.success("Account created successfully!");
+        navigate("/login", { viewTransition: true });
+      }
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "An error occurred during sign up.";
+      toast.error(errorMessage);
+      setEmailError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,9 +178,8 @@ const SignUpPage = () => {
                     }}
                     onBlur={() => validateFirstName(firstName)}
                     required
-                    className={`w-full px-4 py-3 border rounded-md ${
-                      firstNameError ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-md ${firstNameError ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {firstNameError && (
                     <p className="text-red-500 text-sm mt-1">{firstNameError}</p>
@@ -167,9 +197,8 @@ const SignUpPage = () => {
                     }}
                     onBlur={() => validateLastName(lastName)}
                     required
-                    className={`w-full px-4 py-3 border rounded-md ${
-                      lastNameError ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-md ${lastNameError ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {lastNameError && (
                     <p className="text-red-500 text-sm mt-1">{lastNameError}</p>
@@ -189,9 +218,8 @@ const SignUpPage = () => {
                   }}
                   onBlur={() => validateEmail(email)}
                   required
-                  className={`w-full px-4 py-3 border rounded-md ${
-                    emailError ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-md ${emailError ? "border-red-500" : "border-gray-300"
+                    }`}
                 />
                 {emailError && (
                   <p className="text-red-500 text-sm mt-1">{emailError}</p>
@@ -210,9 +238,8 @@ const SignUpPage = () => {
                   }}
                   onBlur={() => validatePassword(password)}
                   required
-                  className={`w-full px-4 py-3 border rounded-md ${
-                    passwordError ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-md ${passwordError ? "border-red-500" : "border-gray-300"
+                    }`}
                 />
                 {passwordError && (
                   <p className="text-red-500 text-sm mt-1">{passwordError}</p>
@@ -222,6 +249,26 @@ const SignUpPage = () => {
                 </p>
               </div>
 
+              <div>
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (confirmPasswordError) validateConfirmPassword(e.target.value);
+                  }}
+                  onBlur={() => validateConfirmPassword(confirmPassword)}
+                  required
+                  className={`w-full px-4 py-3 border rounded-md ${confirmPasswordError ? "border-red-500" : "border-gray-300"
+                    }`}
+                />
+                {confirmPasswordError && (
+                  <p className="text-red-500 text-sm mt-1">{confirmPasswordError}</p>
+                )}
+              </div>
+
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Creating Account..." : "Sign Up"}
               </Button>
@@ -229,7 +276,7 @@ const SignUpPage = () => {
 
             <p className="text-center text-sm mt-4">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-600 underline">
+              <Link to="/login" className="text-blue-600 underline" viewTransition>
                 Log in
               </Link>
             </p>
