@@ -1,7 +1,7 @@
 export type Category = "Hot Drinks" | "Cold Drinks" | "Fresh Juices" | "Smoothies" | "Milkshakes" | "Specialty Drinks" | "Energy Drinks";
 
 export interface Product {
-  _id: string;
+  _id: number;
   name: string;
   description: string;
   price: number;
@@ -19,11 +19,12 @@ export type CartItem = Product & {
   quantity: number;
 };
 
-export interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  updated_at: string | null;
+export interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
 }
 
 export interface OrderItem {
@@ -63,4 +64,10 @@ export interface Address {
 export interface MockUser {
   id: string;
   email: string;
+}
+
+export interface ItokenData {
+  id: string;
+  iat: number;
+  exp: number;
 }
