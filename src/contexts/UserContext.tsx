@@ -14,6 +14,8 @@ interface UserContextType {
   logout: () => Promise<void>;
   forgetPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, data: { password: string, confirmPassword: string }) => Promise<void>;
+  updateProfile: (data: { firstName: string, lastName: string }) => Promise<void>;
+  deleteAccount: () => Promise<boolean>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -63,7 +65,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const handleLogin = async (credentials: any) => {
-    try {
+    const loginPromise = async () => {
       const data = await authService.login(credentials);
 
       if (data.token) {
@@ -72,47 +74,104 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setToken(data.token);
         setTokenData(decodedToken);
         await loadUserProfile(data.token);
-        toast.success("Logged in successfully!");
-      } else {
-        throw new Error("No token received.");
+        return data;
       }
+      throw new Error("No token received.");
+    };
+
+    try {
+      await toast.promise(loginPromise(), {
+        loading: "Logging in...",
+        success: "Logged in successfully!",
+        error: (err: any) => err.response?.data?.message || "Failed to login.",
+      });
     } catch (error: any) {
       throw error;
     }
   };
 
   const handleLogout = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error("Logout API failed, but clearing local session anyway.", error);
-    } finally {
-      localStorage.removeItem("auth_token");
-      setToken(null);
-      setTokenData(null);
-      setUser(null);
-      toast.success("Logged out successfully.");
-    }
+    const logoutPromise = async () => {
+      try {
+        await authService.logout();
+      } catch (error) {
+        console.error("Logout API failed, but clearing local session anyway.", error);
+      } finally {
+        localStorage.removeItem("auth_token");
+        setToken(null);
+        setTokenData(null);
+        setUser(null);
+      }
+    };
+
+    await toast.promise(logoutPromise(), {
+      loading: "Logging out...",
+      success: "Logged out successfully.",
+      error: "Failed to logout.",
+    });
   };
 
   const handleForgetPassword = async (email: string) => {
     try {
-      await authService.forgetPassword(email);
-      toast.success("If an account exists with this email, a password reset link has been sent.");
+      await toast.promise(authService.forgetPassword(email), {
+        loading: "Sending reset link...",
+        success: "If an account exists with this email, a password reset link has been sent.",
+        error: (err: any) => err.response?.data?.message || "Failed to send reset email.",
+      });
     } catch (error: any) {
-      const msg = error.response?.data?.message || "Failed to send reset email.";
-      toast.error(msg);
       throw error;
     }
   };
 
   const handleResetPassword = async (resetToken: string, data: { password: string, confirmPassword: string }) => {
     try {
-      await authService.resetPassword(resetToken, data);
-      toast.success("Password reset successfully. You can now log in.");
+      await toast.promise(authService.resetPassword(resetToken, data), {
+        loading: "Resetting password...",
+        success: "Password reset successfully. You can now log in.",
+        error: (err: any) => err.response?.data?.message || "Failed to reset password.",
+      });
     } catch (error: any) {
-      const msg = error.response?.data?.message || "Failed to reset password.";
-      toast.error(msg);
+      throw error;
+    }
+  };
+
+  const handleUpdateProfile = async (data: { firstName: string, lastName: string }) => {
+    if (!token) return;
+    try {
+      const response = await toast.promise(authService.updateMe(token, data), {
+        loading: "Updating profile...",
+        success: "Profile updated successfully!",
+        error: (err: any) => err.response?.data?.message || "Failed to update profile.",
+      });
+      setUser(response.data);
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!token) return false;
+
+    const deletePromise = async () => {
+      const response = await authService.deleteMe(token);
+      if (response.status === 204 || response.status === 200) {
+        localStorage.removeItem("auth_token");
+        setToken(null);
+        setTokenData(null);
+        setUser(null);
+        return true;
+      }
+      throw new Error("Failed to delete account.");
+    };
+
+    try {
+      await toast.promise(deletePromise(), {
+        loading: "Deleting account...",
+        success: "Account deleted successfully.",
+        error: (err: any) => err.response?.data?.message || "Failed to delete account.",
+      });
+      return true;
+    } catch (error: any) {
       throw error;
     }
   };
@@ -129,6 +188,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         logout: handleLogout,
         forgetPassword: handleForgetPassword,
         resetPassword: handleResetPassword,
+        updateProfile: handleUpdateProfile,
+        deleteAccount: handleDeleteAccount,
       }}
     >
       {children}
