@@ -205,21 +205,44 @@ const OrdersTab = ({ userId }: { userId: string }) => {
 };
 
 const ProfileTab = ({ profile }: { profile: any }) => {
-  // const { user } = useUser();
+  const { updateProfile, deleteAccount } = useUser();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     firstName: profile.firstName || "",
     lastName: profile.lastName || "",
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       toast.error("First name and last name are required");
       return;
     }
-    // updateProfile(formData);  // Temporarily stubbed until update user endpoint is available
-    toast.success("Profile updated locally (API not yet integrated)");
-    setIsEditing(false);
+
+    try {
+      await updateProfile(formData);
+      setIsEditing(false);
+    } catch (error) {
+      // Error is handled by context toaster
+    }
+  };
+
+  const handleDelete = async () => {
+    const conf = window.confirm("Are you absolutely sure you want to permanently delete your account? This action cannot be undone.");
+    if (!conf) return;
+
+    setIsDeleting(true);
+    try {
+      const deleted = await deleteAccount();
+      if (deleted) {
+        navigate("/");
+      }
+    } catch (error) {
+      // Error handled by context toaster
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -232,7 +255,7 @@ const ProfileTab = ({ profile }: { profile: any }) => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
         <h2 className="font-heading text-2xl">Profile Details</h2>
         {!isEditing && (
           <Button onClick={() => setIsEditing(true)} variant="outline" className="flex items-center gap-2">
@@ -295,6 +318,21 @@ const ProfileTab = ({ profile }: { profile: any }) => {
           </div>
         )}
       </form>
+
+      <div className="mt-12 pt-8 border-t border-brand-gray/50">
+        <h3 className="font-heading text-xl text-red-600 mb-2">Danger Zone</h3>
+        <p className="text-sm text-brand-black/70 mb-4">
+          Permanently delete your account and all associated data. This action cannot be undone.
+        </p>
+        <Button
+          variant="outline"
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700"
+        >
+          {isDeleting ? "Deleting..." : "Delete Account"}
+        </Button>
+      </div>
     </div>
   );
 };

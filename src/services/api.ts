@@ -82,5 +82,29 @@ export const authService = {
       }
     });
     return response.data;
+  },
+
+  /**
+   * Update current user profile
+   */
+  updateMe: async (token: string, data: { firstName: string, lastName: string }) => {
+    const response = await api.patch('/users/updateMe', data, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  },
+
+  /**
+   * Delete current user account
+   */
+  deleteMe: async (token: string) => {
+    const response = await api.delete('/users/deleteMe', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response;
   }
 };
