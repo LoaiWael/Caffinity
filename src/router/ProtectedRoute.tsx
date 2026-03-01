@@ -1,8 +1,8 @@
-import { useAuth } from '../contexts/AuthContext';
 import { Navigate, Outlet } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
 
 const ProtectedRoute = () => {
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading } = useUser();
 
     if (loading) {
         return <div className="text-center py-40">Loading...</div>;
