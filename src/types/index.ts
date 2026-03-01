@@ -1,7 +1,7 @@
 export type Category = "Hot Drinks" | "Cold Drinks" | "Fresh Juices" | "Smoothies" | "Milkshakes" | "Specialty Drinks" | "Energy Drinks";
 
 export interface Product {
-  _id: number;
+  _id: string;
   name: string;
   description: string;
   price: number;
@@ -29,7 +29,7 @@ export interface User {
 
 export interface OrderItem {
   id: number;
-  productId: number;
+  productId: string;
   name: string;
   quantity: number;
   price: number;

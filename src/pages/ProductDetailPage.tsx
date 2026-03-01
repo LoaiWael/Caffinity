@@ -79,11 +79,11 @@ const ProductDetailPage: React.FC = () => {
 
       <div className="container mx-auto px-6 py-12">
         <p className="text-sm uppercase tracking-wider text-brand-black/70 mb-8">
-          <Link to="/" className="hover:text-brand-black">
+          <Link to="/" className="hover:text-brand-black" viewTransition>
             Home
           </Link>{" "}
           /
-          <Link to="/collections" className="hover:text-brand-black">
+          <Link to="/collections" className="hover:text-brand-black" viewTransition>
             {" "}
             Collections
           </Link>{" "}
