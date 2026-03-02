@@ -44,7 +44,7 @@ const CartOverlay = () => {
                       <div className="flex-grow flex flex-col justify-between">
                         <div>
                           <h3 className="font-medium text-sm leading-tight">{item.name}</h3>
-                          <p className="text-sm font-semibold mt-1">€{item.price.toFixed(2)}</p>
+                          <p className="text-sm font-semibold mt-1">{`${item.currency} ${item.price.toFixed(2)}`}</p>
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center border border-brand-gray rounded-lg">
@@ -64,7 +64,7 @@ const CartOverlay = () => {
                     <span>Subtotal</span>
                     <span className="font-semibold">€{totalPrice.toFixed(2)}</span>
                   </div>
-                  <Link to="/cart" onClick={() => setIsCartOpen(false)} className="w-full">
+                  <Link to="/cart" onClick={() => setIsCartOpen(false)} className="w-full" viewTransition>
                     <Button className="w-full">Go to Checkout</Button>
                   </Link>
                 </div>

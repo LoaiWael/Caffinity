@@ -1,22 +1,29 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { useCart } from '../contexts/CartContext';
+import { useUser } from '../contexts/UserContext';
 
-const InputField = ({ label, type = 'text', placeholder }: { label: string, type?: string, placeholder: string }) => (
+const InputField = ({ label, type = 'text', placeholder, value }: { label: string, type?: string, placeholder: string, value?: string }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
         <input
             type={type}
             placeholder={placeholder}
             className="w-full px-4 py-3 border border-brand-gray rounded-md focus:ring-brand-black focus:border-brand-black"
+            value={value}
         />
     </div>
 );
 
 const CheckoutDeliveryPage = () => {
+    const { user } = useUser();
+    const { cartItems } = useCart();
+    const [currency, setCurrency] = useState(cartItems.length != 0 ? cartItems[0].currency : '$');
+
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
+        setCurrency(cartItems.length != 0 ? cartItems[0].currency : '$')
     }, []);
 
     const { totalPrice } = useCart();
@@ -39,8 +46,8 @@ const CheckoutDeliveryPage = () => {
                         <div className="lg:col-span-2 bg-white p-8 space-y-6">
                             <h2 className="font-heading text-2xl">Shipping Address</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <InputField label="First Name" placeholder="Enter your first name" />
-                                <InputField label="Last Name" placeholder="Enter your last name" />
+                                <InputField label="First Name" placeholder="Enter your first name" value={user?.firstName} />
+                                <InputField label="Last Name" placeholder="Enter your last name" value={user?.lastName} />
                             </div>
                             <InputField label="Street and house number" placeholder="Enter your address" />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -59,7 +66,7 @@ const CheckoutDeliveryPage = () => {
 
                             <div className="pt-8">
                                 <h2 className="font-heading text-2xl mb-4">Contact Information</h2>
-                                <InputField label="Email Address" type="email" placeholder="Enter your email" />
+                                <InputField label="Email Address" type="email" placeholder="Enter your email" value={user?.email} />
                             </div>
                         </div>
 
@@ -68,16 +75,16 @@ const CheckoutDeliveryPage = () => {
                             <div className="space-y-4">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>€{totalPrice.toFixed(2)}</span>
+                                    <span>{`${currency} ${totalPrice.toFixed(2)}`}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Delivery</span>
-                                    <span>€3.95</span>
+                                    <span>{currency} 3.95</span>
                                 </div>
                                 <hr className="border-brand-gray-dark my-4" />
                                 <div className="flex justify-between font-bold text-xl">
                                     <span>Total</span>
-                                    <span>€{(totalPrice + 3.95).toFixed(2)}</span>
+                                    <span>{`${currency} ${(totalPrice + 3.95).toFixed(2)}`}</span>
                                 </div>
                                 <Button asChild to="/checkout/payment" className="w-full mt-4">Go to payment</Button>
                             </div>
