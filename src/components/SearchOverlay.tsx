@@ -58,14 +58,14 @@ const SearchOverlay: React.FC = () => {
                           <img
                             src={drink.image}
                             alt={drink.name}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover object-center  rounded-lg"
                           />
                         </div>
                         <h3 className="text-sm font-medium uppercase text-brand-black mb-1">
                           {drink.name}
                         </h3>
                         <p className="text-sm font-semibold text-brand-black">
-                          ${drink.price.toFixed(2)}
+                          {`${drink.currency} ${drink.price.toFixed(2)}`}
                         </p>
                       </div>
                     </Link>
