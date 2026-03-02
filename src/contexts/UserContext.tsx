@@ -1,13 +1,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import toast from "react-hot-toast";
-import { User, ItokenData } from "../types";
-import { authService } from "../services/api";
+import { User, ItokenData, Order } from "../types";
+import { authService, orderService } from "../services/api";
 
 interface UserContextType {
   isAuthenticated: boolean;
   tokenData: ItokenData | null;
   user: User | null;
+  orders: Order[];
   token: string | null;
   loading: boolean;
   login: (credentials: any) => Promise<void>;
@@ -23,13 +24,24 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [tokenData, setTokenData] = useState<ItokenData | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadUserProfile = async (authToken: string) => {
     try {
-      const response = await authService.getMe(authToken);
-      setUser(response.data);
+      const [profileResponse, ordersResponse] = await Promise.all([
+        authService.getMe(authToken),
+        orderService.getMyOrders(authToken).catch(err => {
+          console.error("Failed to load orders", err);
+          return null;
+        })
+      ]);
+      const userData = profileResponse.data;
+      setUser(userData);
+
+      const ordersData = ordersResponse?.data || [];
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
     } catch (error) {
       console.error("Failed to load user profile", error);
     }
@@ -101,6 +113,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setToken(null);
         setTokenData(null);
         setUser(null);
+        setOrders([]);
       }
     };
 
@@ -159,6 +172,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setToken(null);
         setTokenData(null);
         setUser(null);
+        setOrders([]);
         return true;
       }
       throw new Error("Failed to delete account.");
@@ -182,6 +196,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!token && !!user,
         tokenData,
         user,
+        orders,
         token,
         loading,
         login: handleLogin,

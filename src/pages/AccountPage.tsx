@@ -29,7 +29,7 @@ const AccountPage = () => {
       case "dashboard":
         return <DashboardTab profile={user} />;
       case "orders":
-        return <OrdersTab userId={user._id} />;
+        return <OrdersTab />;
       case "profile":
         return <ProfileTab profile={user} />;
       case "addresses":
@@ -111,21 +111,20 @@ const DashboardTab = ({ profile }: { profile: any }) => (
   </div>
 );
 
-const OrdersTab = ({ userId }: { userId: string }) => {
+const OrdersTab = () => {
+  const { orders: contextOrders } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get all orders and filter by userId
-    const allOrders = JSON.parse(localStorage.getItem("all_orders") || "[]");
-    const userOrders = allOrders.filter((order: Order) => order.userId === userId);
-    // Sort by date, newest first
-    userOrders.sort((a: Order, b: Order) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-    setOrders(userOrders);
+    if (contextOrders) {
+      const sortedOrders = [...contextOrders].sort((a: Order, b: Order) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setOrders(sortedOrders);
+    }
     setLoading(false);
-  }, [userId]);
+  }, [contextOrders]);
 
   if (loading) return <div>Loading order history...</div>;
   if (orders.length === 0) return (
@@ -141,14 +140,14 @@ const OrdersTab = ({ userId }: { userId: string }) => {
       <div className="space-y-6">
         {orders.map((order) => (
           <div
-            key={order.id}
+            key={order._id}
             className="border border-brand-gray rounded-md p-4"
           >
             <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
               <div>
-                <h3 className="font-semibold">Order #{order.id}</h3>
+                <h3 className="font-semibold">Order #{order._id.substring(order._id.length - 8).toUpperCase()}</h3>
                 <p className="text-sm text-brand-black/70">
-                  Date: {new Date(order.created_at).toLocaleDateString('en-US', {
+                  Date: {new Date(order.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -159,25 +158,18 @@ const OrdersTab = ({ userId }: { userId: string }) => {
               </div>
               <div className="text-right mt-2 sm:mt-0">
                 <p className="font-semibold">
-                  {order.order_items[0]?.price ? '€' : ''}
-                  {order.total_amount.toFixed(2)}
+                  {order.currency === 'usd' ? '$' : '€'}
+                  {order.totalPrice.toFixed(2)}
                 </p>
                 <p className="text-sm capitalize text-brand-black/70">
-                  Status: <span className="font-medium text-brand-black">{order.status}</span>
+                  Status: <span className="font-medium text-brand-black">{order.orderStatus}</span>
+                  <span className="mx-2">|</span> Payment: <span className="font-medium text-brand-black">{order.paymentStatus}</span>
                 </p>
               </div>
             </div>
-            {order.shipping_address && (
-              <div className="mb-3 pb-3 border-b border-brand-gray">
-                <p className="text-sm font-medium text-brand-black/70">Shipping Address:</p>
-                <p className="text-sm text-brand-black">
-                  {order.shipping_address.fullName}, {order.shipping_address.addressLine1}, {order.shipping_address.city}, {order.shipping_address.postalCode}, {order.shipping_address.country}
-                </p>
-              </div>
-            )}
             <div className="space-y-3">
-              {order.order_items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 py-2">
+              {order.items.map((item, index) => (
+                <div key={index} className="flex items-center gap-4 py-2">
                   <div className="w-16 h-16 rounded-md bg-brand-gray-light flex items-center justify-center overflow-hidden">
                     {item.image ? (
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
