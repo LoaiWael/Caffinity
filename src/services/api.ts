@@ -108,3 +108,29 @@ export const authService = {
     return response;
   }
 };
+
+export const orderService = {
+  /**
+   * Create checkout session
+   */
+  checkoutSession: async (token: string, data: { items: { productId: string, quantity: number }[] }) => {
+    const response = await api.post('/orders/checkout-session', data, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  },
+
+  /**
+   * Get current user's orders
+   */
+  getMyOrders: async (token: string) => {
+    const response = await api.get('/orders/my-orders', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data.data;
+  }
+};
