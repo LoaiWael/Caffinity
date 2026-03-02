@@ -28,22 +28,23 @@ export interface User {
 }
 
 export interface OrderItem {
-  id: number;
-  productId: string;
+  product: Product;
   name: string;
-  quantity: number;
+  image: string;
   price: number;
-  image: string | null;
+  quantity: number;
 }
 
 export interface Order {
-  id: string;
-  userId: string;
-  created_at: string;
-  total_amount: number;
-  status: string;
-  shipping_address: Address | null;
-  order_items: OrderItem[];
+  _id: string;
+  user: string;
+  items: OrderItem[];
+  totalPrice: number;
+  currency: 'usd';
+  stripeSessionId: string;
+  paymentStatus: 'pending' | 'paid' | 'failed' | string;
+  orderStatus: 'processing' | 'shipped' | 'delivered' | 'cancelled' | string;
+  createdAt: string;
 }
 
 export interface Address {
