@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Coffee, Award, Truck, Tag, Star, } from "lucide-react";
 import ProductCard from "../components/ProductCard";
@@ -61,6 +61,7 @@ const categories = [
 ];
 
 const HomePage = () => {
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -99,9 +100,7 @@ const HomePage = () => {
               Your daily dose of delicious. Order your finest drink,
               delivered right to your door.
             </p>
-            <Button asChild to="/collections">
-              Browse Collections
-            </Button>
+            <Button className="cursor-pointer" asChild onClick={() => navigate("/collections", { viewTransition: true })}>Browse Collections</Button>
           </div>
           <div className="lg:absolute lg:right-0 lg:top-0 lg:w-1/2 lg:h-full w-full mt-8 lg:mt-0 px-4 h-auto">
             <img
