@@ -1,24 +1,19 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Mail, Phone } from 'lucide-react';
-import drinksData from "../data/drinks_menu.json";
-
-interface Drink {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  price: number;
-  currency: string;
-  image: string;
-  available: boolean;
-  rating: number;
-}
-
-const drinks: Drink[] = drinksData as Drink[];
+import { productService } from "../services/api";
+import { useEffect, useState } from 'react';
+import Loader from './ui/Loader';
 
 const Footer = () => {
-  const ALL_DRINK_CATEGORIES = Array.from(new Set(drinks.map((d) => d.category)));
-  const collections = ALL_DRINK_CATEGORIES;
+  const [categories, setCategories] = useState<string[] | null>(null)
+
+  useEffect(() => {
+    const getCategories = async () => {
+      const drinks = await productService.getProducts();
+      setCategories(Array.from(new Set(drinks.data.map((d) => d.category))))
+    }
+    getCategories();
+  }, [])
 
   const learn = ["About us", "About our teas", "Tea academy"];
   const customerService = ["Ordering and payment", "Delivery", "Privacy and policy", "Terms & Conditions"];
@@ -30,7 +25,7 @@ const Footer = () => {
         <div>
           <h3 className="font-heading text-lg font-semibold uppercase text-brand-black mb-4">Collections</h3>
           <ul className="space-y-2">
-            {collections.map(item => (
+            {categories ? categories.map(item => (
               <li key={item}>
                 <Link
                   to={`/collections?category=${encodeURIComponent(item)}`}
@@ -40,7 +35,10 @@ const Footer = () => {
                   {item}
                 </Link>
               </li>
-            ))}
+            ))
+              :
+              <Loader />
+            }
           </ul>
         </div>
 
