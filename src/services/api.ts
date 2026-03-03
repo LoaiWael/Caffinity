@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Product } from '../types';
+
 
 export const api = axios.create({
   baseURL: '/api/v1',
@@ -18,16 +18,41 @@ export const productService = {
    * Fetch all products with optional filtering and sorting
    */
   getProducts: async (params?: GetProductsParams) => {
-    const response = await api.get<{ status: string; results?: number; data: Product[] }>('/products', { params });
-    return response.data;
+    const response = await api.get('/products', { params });
+    const resData = response.data;
+
+    // Handle direct array response
+    if (Array.isArray(resData)) {
+      return { status: 'success', data: resData };
+    }
+
+    // Handle { data: [...] } wrapped response
+    if (resData && Array.isArray(resData.data)) {
+      return resData;
+    }
+
+    // Handle { data: { products: [...] } } or similar missing arrays
+    if (resData && resData.data && Array.isArray(resData.data.products)) {
+      return { status: 'success', data: resData.data.products };
+    }
+
+    return { status: 'success', data: [] };
   },
 
   /**
    * Fetch a single product by ID
    */
   getProductById: async (id: string) => {
-    const response = await api.get<{ status: string; data: Product }>(`/products/${id}`);
-    return response.data;
+    const response = await api.get(`/products/${id}`);
+    const resData = response.data;
+
+    // Handle typical wrapped response { data: Product }
+    if (resData && resData.data && typeof resData.data === 'object') {
+      return resData;
+    }
+
+    // Handle direct product object
+    return { status: 'success', data: resData };
   }
 };
 

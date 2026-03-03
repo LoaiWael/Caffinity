@@ -9,8 +9,14 @@ const Footer = () => {
 
   useEffect(() => {
     const getCategories = async () => {
-      const drinks = await productService.getProducts();
-      setCategories(Array.from(new Set(drinks.data.map((d) => d.category))))
+      try {
+        const drinks = await productService.getProducts();
+        const data = drinks?.data || [];
+        setCategories(Array.from(new Set(data.map((d: any) => d.category))));
+      } catch (error) {
+        console.error("Error fetching categories for footer:", error);
+        setCategories([]);
+      }
     }
     getCategories();
   }, [])
