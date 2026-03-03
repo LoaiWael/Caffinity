@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 export const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: 'https://caffinity-api.vercel.app/api/v1',
 });
 
 export interface GetProductsParams {
