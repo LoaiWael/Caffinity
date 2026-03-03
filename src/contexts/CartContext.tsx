@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { CartItem, Drink } from '../types';
+import { CartItem, Product } from '../types';
 import toast from 'react-hot-toast';
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Drink, quantity?: number) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  addToCart: (product: Product, quantity?: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   cartCount: number;
   totalPrice: number;
@@ -28,12 +28,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }
 
-  const addToCart = (product: Drink, quantityToAdd: number = 1) => {
+  const addToCart = (product: Product, quantityToAdd: number = 1) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+      const existingItem = prevItems.find(item => item._id === product._id);
       if (existingItem) {
         return prevItems.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantityToAdd } : item
+          item._id === product._id ? { ...item, quantity: item.quantity + quantityToAdd } : item
         );
       }
       return [...prevItems, { ...product, quantity: quantityToAdd }];
@@ -42,23 +42,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (productId: number) => {
+  const removeFromCart = (productId: string) => {
     setCartItems(prevItems => {
-      const itemToRemove = prevItems.find(item => item.id === productId);
+      const itemToRemove = prevItems.find(item => item._id === productId);
       if (itemToRemove) {
         toast.error(`${itemToRemove.name} removed from cart.`);
       }
-      return prevItems.filter(item => item.id !== productId)
+      return prevItems.filter(item => item._id !== productId)
     });
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
     } else {
       setCartItems(prevItems =>
         prevItems.map(item =>
-          item.id === productId ? { ...item, quantity } : item
+          item._id === productId ? { ...item, quantity } : item
         )
       );
     }

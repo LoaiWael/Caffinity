@@ -1,46 +1,62 @@
 export type Category = "Hot Drinks" | "Cold Drinks" | "Fresh Juices" | "Smoothies" | "Milkshakes" | "Specialty Drinks" | "Energy Drinks";
 
-export interface Drink {
-  id: number;
+export interface Product {
+  _id: string;
   name: string;
-  description: string | null;
+  description: string;
   price: number;
   currency: string;
-  image: string | null;
-  created_at?: string;
+  ratingsAverage: number;
+  ratingsQuantity: number;
   category: Category | string;
-  rating: number;
-  available: boolean;
+  image: string;
+  isAvailable: boolean;
+  slug: string;
+  __v: number;
 }
 
-export type CartItem = Drink & {
+export type CartItem = Product & {
   quantity: number;
 };
 
-export interface Profile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  updated_at: string | null;
+export interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+}
+
+export interface Review {
+  _id: string;
+  review: string;
+  rating: number; // minimum: 1, maximum: 5
+  product: string;
+  user: {
+    firstName: string;
+    lastName: string;
+  };
+  createdAt: string;
 }
 
 export interface OrderItem {
-  id: number;
-  productId: number;
+  product: Product;
   name: string;
-  quantity: number;
+  image: string;
   price: number;
-  image: string | null;
+  quantity: number;
 }
 
 export interface Order {
-  id: string;
-  userId: string;
-  created_at: string;
-  total_amount: number;
-  status: string;
-  shipping_address: Address | null;
-  order_items: OrderItem[];
+  _id: string;
+  user: string;
+  items: OrderItem[];
+  totalPrice: number;
+  currency: 'usd';
+  stripeSessionId: string;
+  paymentStatus: 'pending' | 'paid' | 'failed' | string;
+  orderStatus: 'processing' | 'shipped' | 'delivered' | 'cancelled' | string;
+  createdAt: string;
 }
 
 export interface Address {
@@ -61,4 +77,10 @@ export interface Address {
 export interface MockUser {
   id: string;
   email: string;
+}
+
+export interface ItokenData {
+  id: string;
+  iat: number;
+  exp: number;
 }

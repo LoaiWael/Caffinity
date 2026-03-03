@@ -47,24 +47,25 @@ const SearchOverlay: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                   {filteredDrinks.map((drink) => (
                     <Link
-                      to={`/products/${drink.id}`}
-                      key={drink.id}
+                      to={`/products/${drink._id || drink.slug}`}
+                      key={drink._id}
                       onClick={() => setIsSearchOpen(false)}
                       className="group"
+                      viewTransition
                     >
                       <div className="flex flex-col items-start text-left">
                         <div className="bg-brand-gray-light w-full aspect-square overflow-hidden mb-4">
                           <img
                             src={drink.image}
                             alt={drink.name}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover object-center  rounded-lg"
                           />
                         </div>
                         <h3 className="text-sm font-medium uppercase text-brand-black mb-1">
                           {drink.name}
                         </h3>
                         <p className="text-sm font-semibold text-brand-black">
-                          ${drink.price.toFixed(2)}
+                          {`${drink.currency} ${drink.price.toFixed(2)}`}
                         </p>
                       </div>
                     </Link>

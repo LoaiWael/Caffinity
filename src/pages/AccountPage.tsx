@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, ShoppingBag, MapPin, LogOut, Plus, Edit2, Trash2, Check, X } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { useUser } from "../contexts/UserContext";
 import { Button } from "../components/ui/Button";
 import { useNavigate } from "react-router-dom";
 import type { Order, Address } from "../types";
@@ -10,7 +10,7 @@ type Tab = "dashboard" | "orders" | "profile" | "addresses";
 
 const AccountPage = () => {
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
-  const { profile, logout, loading: authLoading } = useAuth();
+  const { user, logout, loading: authLoading } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const AccountPage = () => {
 
   if (authLoading)
     return <div className="text-center py-20">Loading account...</div>;
-  if (!profile) {
+  if (!user) {
     navigate("/login");
     return null;
   }
@@ -27,13 +27,13 @@ const AccountPage = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <DashboardTab profile={profile} />;
+        return <DashboardTab profile={user} />;
       case "orders":
-        return <OrdersTab userId={profile.id} />;
+        return <OrdersTab />;
       case "profile":
-        return <ProfileTab profile={profile} />;
+        return <ProfileTab profile={user} />;
       case "addresses":
-        return <AddressesTab userId={profile.id} />;
+        return <AddressesTab userId={user._id} />;
       default:
         return null;
     }
@@ -62,7 +62,7 @@ const AccountPage = () => {
 
   return (
     <>
-      <title>Caffinity - {profile.firstName} Account</title>
+      <title>Caffinity - {user.firstName} Account</title>
 
       <div className="bg-brand-gray-light min-h-[calc(100vh-12rem)]">
         <div className="container mx-auto px-6 py-12">
@@ -80,8 +80,7 @@ const AccountPage = () => {
                       "Are you sure you want to logout?"
                     );
                     if (!conf) return;
-                    logout();
-                    navigate("/");
+                    logout().then(() => navigate("/"))
                   }}
                   className="flex items-center gap-3 w-full text-left px-4 py-3 rounded-md transition-colors hover:bg-brand-gray-light text-brand-black/70"
                 >
@@ -112,21 +111,20 @@ const DashboardTab = ({ profile }: { profile: any }) => (
   </div>
 );
 
-const OrdersTab = ({ userId }: { userId: string }) => {
+const OrdersTab = () => {
+  const { orders: contextOrders } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get all orders and filter by userId
-    const allOrders = JSON.parse(localStorage.getItem("all_orders") || "[]");
-    const userOrders = allOrders.filter((order: Order) => order.userId === userId);
-    // Sort by date, newest first
-    userOrders.sort((a: Order, b: Order) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-    setOrders(userOrders);
+    if (contextOrders) {
+      const sortedOrders = [...contextOrders].sort((a: Order, b: Order) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setOrders(sortedOrders);
+    }
     setLoading(false);
-  }, [userId]);
+  }, [contextOrders]);
 
   if (loading) return <div>Loading order history...</div>;
   if (orders.length === 0) return (
@@ -142,14 +140,14 @@ const OrdersTab = ({ userId }: { userId: string }) => {
       <div className="space-y-6">
         {orders.map((order) => (
           <div
-            key={order.id}
+            key={order._id}
             className="border border-brand-gray rounded-md p-4"
           >
             <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
               <div>
-                <h3 className="font-semibold">Order #{order.id}</h3>
+                <h3 className="font-semibold">Order #{order._id.substring(order._id.length - 8).toUpperCase()}</h3>
                 <p className="text-sm text-brand-black/70">
-                  Date: {new Date(order.created_at).toLocaleDateString('en-US', {
+                  Date: {new Date(order.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -160,25 +158,18 @@ const OrdersTab = ({ userId }: { userId: string }) => {
               </div>
               <div className="text-right mt-2 sm:mt-0">
                 <p className="font-semibold">
-                  {order.order_items[0]?.price ? '€' : ''}
-                  {order.total_amount.toFixed(2)}
+                  {order.currency === 'usd' ? '$' : '€'}
+                  {order.totalPrice.toFixed(2)}
                 </p>
                 <p className="text-sm capitalize text-brand-black/70">
-                  Status: <span className="font-medium text-brand-black">{order.status}</span>
+                  Status: <span className="font-medium text-brand-black">{order.orderStatus}</span>
+                  <span className="mx-2">|</span> Payment: <span className="font-medium text-brand-black">{order.paymentStatus}</span>
                 </p>
               </div>
             </div>
-            {order.shipping_address && (
-              <div className="mb-3 pb-3 border-b border-brand-gray">
-                <p className="text-sm font-medium text-brand-black/70">Shipping Address:</p>
-                <p className="text-sm text-brand-black">
-                  {order.shipping_address.fullName}, {order.shipping_address.addressLine1}, {order.shipping_address.city}, {order.shipping_address.postalCode}, {order.shipping_address.country}
-                </p>
-              </div>
-            )}
             <div className="space-y-3">
-              {order.order_items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 py-2">
+              {order.items.map((item, index) => (
+                <div key={index} className="flex items-center gap-4 py-2">
                   <div className="w-16 h-16 rounded-md bg-brand-gray-light flex items-center justify-center overflow-hidden">
                     {item.image ? (
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -206,20 +197,44 @@ const OrdersTab = ({ userId }: { userId: string }) => {
 };
 
 const ProfileTab = ({ profile }: { profile: any }) => {
-  const { updateProfile } = useAuth();
+  const { updateProfile, deleteAccount } = useUser();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     firstName: profile.firstName || "",
     lastName: profile.lastName || "",
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       toast.error("First name and last name are required");
       return;
     }
-    updateProfile(formData);
-    setIsEditing(false);
+
+    try {
+      await updateProfile(formData);
+      setIsEditing(false);
+    } catch (error) {
+      // Error is handled by context toaster
+    }
+  };
+
+  const handleDelete = async () => {
+    const conf = window.confirm("Are you absolutely sure you want to permanently delete your account? This action cannot be undone.");
+    if (!conf) return;
+
+    setIsDeleting(true);
+    try {
+      const deleted = await deleteAccount();
+      if (deleted) {
+        navigate("/");
+      }
+    } catch (error) {
+      // Error handled by context toaster
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -232,7 +247,7 @@ const ProfileTab = ({ profile }: { profile: any }) => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
         <h2 className="font-heading text-2xl">Profile Details</h2>
         {!isEditing && (
           <Button onClick={() => setIsEditing(true)} variant="outline" className="flex items-center gap-2">
@@ -251,9 +266,8 @@ const ProfileTab = ({ profile }: { profile: any }) => {
               type="text"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${
-                isEditing ? "bg-white" : "bg-brand-gray-light"
-              }`}
+              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${isEditing ? "bg-white" : "bg-brand-gray-light"
+                }`}
               readOnly={!isEditing}
             />
           </div>
@@ -265,9 +279,8 @@ const ProfileTab = ({ profile }: { profile: any }) => {
               type="text"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${
-                isEditing ? "bg-white" : "bg-brand-gray-light"
-              }`}
+              className={`w-full px-4 py-3 border border-brand-gray rounded-md ${isEditing ? "bg-white" : "bg-brand-gray-light"
+                }`}
               readOnly={!isEditing}
             />
           </div>
@@ -297,6 +310,21 @@ const ProfileTab = ({ profile }: { profile: any }) => {
           </div>
         )}
       </form>
+
+      <div className="mt-12 pt-8 border-t border-brand-gray/50">
+        <h3 className="font-heading text-xl text-red-600 mb-2">Danger Zone</h3>
+        <p className="text-sm text-brand-black/70 mb-4">
+          Permanently delete your account and all associated data. This action cannot be undone.
+        </p>
+        <Button
+          variant="outline"
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700"
+        >
+          {isDeleting ? "Deleting..." : "Delete Account"}
+        </Button>
+      </div>
     </div>
   );
 };
@@ -350,7 +378,7 @@ const AddressesTab = ({ userId }: { userId: string }) => {
         id: `addr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         userId,
       };
-      
+
       // If this is the first address or set as default, make it default
       if (addresses.length === 0 || formData.isDefault) {
         const updatedAddresses = allAddresses.map((addr: Address) =>
@@ -563,9 +591,8 @@ const AddressesTab = ({ userId }: { userId: string }) => {
           addresses.map((address) => (
             <div
               key={address.id}
-              className={`border rounded-lg p-4 ${
-                address.isDefault ? "border-brand-black bg-brand-gray-light/30" : "border-brand-gray"
-              }`}
+              className={`border rounded-lg p-4 ${address.isDefault ? "border-brand-black bg-brand-gray-light/30" : "border-brand-gray"
+                }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-grow">

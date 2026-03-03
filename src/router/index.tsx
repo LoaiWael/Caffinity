@@ -4,19 +4,19 @@ import HomePage from "../pages/HomePage";
 import CollectionsPage from "../pages/CollectionsPage";
 import ProductDetailPage from "../pages/ProductDetailPage";
 import CartPage from "../pages/CartPage";
-import CheckoutDeliveryPage from "../pages/CheckoutDeliveryPage";
-
 import ContactPage from "../pages/ContactPage";
 import AccountPage from "../pages/AccountPage";
 import CheckoutPaymentPage from "../pages/CheckoutPaymentPage";
 import LoginPage from "../pages/LoginPage";
 import OrderConfirmationPage from "../pages/OrderConfirmationPage";
 import SignUpPage from "../pages/SignUpPage";
+import ForgetPasswordPage from "../pages/ForgetPasswordPage";
 import ProtectedRoute from "./ProtectedRoute";
 import RouteErrorPage from "../pages/RouteErrorPage";
 import HotDrinksPage from "../pages/HotDrinksPage";
 import ColdDrinksPage from "../pages/ColdDrinksPage";
-import AddVisaPage from "../pages/AddVisaPage";
+import PaymentErrorPage from "../pages/PaymentErrorPage";
+import ReviewsPage from "../pages/ReviewsPage";
 
 export const router = createBrowserRouter([
   {
@@ -33,13 +33,14 @@ export const router = createBrowserRouter([
       { path: "contact", element: <ContactPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignUpPage /> },
+      { path: "forget-password", element: <ForgetPasswordPage /> },
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "checkout/delivery", element: <CheckoutDeliveryPage /> },
           { path: "checkout/payment", element: <CheckoutPaymentPage /> },
           { path: "order-confirmation", element: <OrderConfirmationPage /> },
-          { path: "add-visa", element: <AddVisaPage /> },
+          { path: "payment-error", element: <PaymentErrorPage /> },
+          { path: "reviews", element: <ReviewsPage /> },
           { path: "account", element: <AccountPage /> },
         ],
       },
