@@ -15,7 +15,8 @@ const Header = () => {
     { name: "Collections", path: "/collections" },
     { name: "Hot Drinks", path: "/hotdrinks" },
     { name: "Cold Drinks", path: "/colddrinks" },
-    { name: "Contact us", path: "/contact" },
+    ...(isAuthenticated ? [{ name: "Reviews", path: "/reviews" }] : []),
+    { name: "Contact us", path: "/contact" }
   ];
 
   return (
