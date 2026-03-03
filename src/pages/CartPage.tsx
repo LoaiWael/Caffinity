@@ -20,9 +20,7 @@ const CartPage = () => {
           <div className="flex items-center justify-center space-x-4 md:space-x-8 mb-12">
             <span className="font-semibold text-lg md:text-xl uppercase">1. My Bag</span>
             <div className="flex-grow h-px bg-brand-gray-dark"></div>
-            <span className="text-lg md:text-xl uppercase text-brand-gray-dark">2. Delivery</span>
-            <div className="flex-grow h-px bg-brand-gray-dark"></div>
-            <span className="text-lg md:text-xl uppercase text-brand-gray-dark">3. Review & Payment</span>
+            <span className="text-lg md:text-xl uppercase text-brand-gray-dark">2. Checkout</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -72,7 +70,7 @@ const CartPage = () => {
                   <span>{`${currency} ${(totalPrice + 3.95).toFixed(2)}`}</span>
                 </div>
                 <p className="text-sm text-brand-black/70">Estimated shipping time: 2 days</p>
-                <Button asChild to="/checkout/delivery" className="w-full mt-4" >Check out</Button>
+                <Button asChild to="/checkout/payment" className="w-full mt-4" >Check out</Button>
               </div>
             </div>
           </div>

@@ -4,8 +4,6 @@ import HomePage from "../pages/HomePage";
 import CollectionsPage from "../pages/CollectionsPage";
 import ProductDetailPage from "../pages/ProductDetailPage";
 import CartPage from "../pages/CartPage";
-import CheckoutDeliveryPage from "../pages/CheckoutDeliveryPage";
-
 import ContactPage from "../pages/ContactPage";
 import AccountPage from "../pages/AccountPage";
 import CheckoutPaymentPage from "../pages/CheckoutPaymentPage";
@@ -39,7 +37,6 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "checkout/delivery", element: <CheckoutDeliveryPage /> },
           { path: "checkout/payment", element: <CheckoutPaymentPage /> },
           { path: "order-confirmation", element: <OrderConfirmationPage /> },
           { path: "payment-error", element: <PaymentErrorPage /> },
