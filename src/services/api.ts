@@ -134,3 +134,32 @@ export const orderService = {
     return response.data.data;
   }
 };
+
+export const reviewService = {
+  getAllReviews: async (token: string) => {
+    const response = await api.get('/reviews', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  },
+
+  getProductReviews: async (productId: string, token: string) => {
+    const response = await api.get(`/products/${productId}/reviews`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  },
+
+  addReview: async (productId: string, token: string, data: { review: string, rating: number }) => {
+    const response = await api.post(`/products/${productId}/reviews`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  }
+};
