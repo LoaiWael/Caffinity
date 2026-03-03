@@ -27,6 +27,18 @@ export interface User {
   role: string;
 }
 
+export interface Review {
+  _id: string;
+  review: string;
+  rating: number; // minimum: 1, maximum: 5
+  product: string;
+  user: {
+    firstName: string;
+    lastName: string;
+  };
+  createdAt: string;
+}
+
 export interface OrderItem {
   product: Product;
   name: string;
