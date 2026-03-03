@@ -151,7 +151,7 @@ const ProductDetailPage: React.FC = () => {
             <img
               src={product.image || ""}
               alt={product.name}
-              className="w-full h-full object-contain aspect-square rounded-xl"
+              className="w-full h-full object-cover aspect-square rounded-xl"
             />
           </div>
 
