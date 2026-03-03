@@ -17,6 +17,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import RouteErrorPage from "../pages/RouteErrorPage";
 import HotDrinksPage from "../pages/HotDrinksPage";
 import ColdDrinksPage from "../pages/ColdDrinksPage";
+import PaymentErrorPage from "../pages/PaymentErrorPage";
+import ReviewsPage from "../pages/ReviewsPage";
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +42,8 @@ export const router = createBrowserRouter([
           { path: "checkout/delivery", element: <CheckoutDeliveryPage /> },
           { path: "checkout/payment", element: <CheckoutPaymentPage /> },
           { path: "order-confirmation", element: <OrderConfirmationPage /> },
+          { path: "payment-error", element: <PaymentErrorPage /> },
+          { path: "reviews", element: <ReviewsPage /> },
           { path: "account", element: <AccountPage /> },
         ],
       },
