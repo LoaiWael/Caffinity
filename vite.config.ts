@@ -10,8 +10,6 @@ export default defineConfig({
     proxy: {
       '/api/v1': {
         target: "https://caffinity-api.vercel.app",
-        changeOrigin: true,
-        secure: false,
       }
     }
   }
