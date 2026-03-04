@@ -184,7 +184,7 @@ const OrdersTab = () => {
                     </p>
                   </div>
                   <p className="font-semibold">
-                    €{(item.price * item.quantity).toFixed(2)}
+                    {order.currency === 'usd' ? '$' : '€'}{(item.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
               ))}
