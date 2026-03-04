@@ -61,7 +61,7 @@ const CartPage = () => {
                   <span>{`${currency} ${totalPrice.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Delivery</span>
+                  <span>Tax</span>
                   <span>{currency} 3.95</span>
                 </div>
                 <hr className="border-brand-gray-dark my-4" />
