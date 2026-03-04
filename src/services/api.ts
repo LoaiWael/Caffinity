@@ -148,6 +148,18 @@ export const orderService = {
   },
 
   /**
+   * Verify an order using Stripe Checkout Session ID
+   */
+  verifyOrder: async (token: string, sessionId: string) => {
+    const response = await api.get(`/orders/verify/${sessionId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  },
+
+  /**
    * Get current user's orders
    */
   getMyOrders: async (token: string) => {
