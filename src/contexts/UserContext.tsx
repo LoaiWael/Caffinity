@@ -40,8 +40,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const userData = profileResponse.data;
       setUser(userData);
 
-      const ordersData = ordersResponse?.data || [];
-      setOrders(Array.isArray(ordersData) ? ordersData : []);
+      setOrders(Array.isArray(ordersResponse) ? ordersResponse : []);
     } catch (error) {
       console.error("Failed to load user profile", error);
     }

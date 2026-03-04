@@ -162,7 +162,7 @@ const OrdersTab = () => {
                   {order.totalPrice.toFixed(2)}
                 </p>
                 <p className="text-sm capitalize text-brand-black/70">
-                  Status: <span className="font-medium text-brand-black">{order.orderStatus}</span>
+                  <span className={`font-medium text-brand-black rounded-full px-3 py-1 ${order.orderStatus === 'processing' ? 'bg-brand-yellow/15 text-brand-yellow' : 'bg-brand-green/15 text-brand-green'}`}>{order.orderStatus}</span>
                   <span className="mx-2">|</span> Payment: <span className="font-medium text-brand-black">{order.paymentStatus}</span>
                 </p>
               </div>
